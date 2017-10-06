@@ -49,9 +49,6 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 [Subject, PlaneVariationRange, StepSize, GD.Visualization, GD.Verbose] = ...
     validateAndParseOptInputs(vertices, faces, side, varargin{:});
 
-% Current Path
-CTP = pwd;
-
 % USP path
 GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
 
@@ -59,11 +56,10 @@ GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
 addpath(genpath([GD.ToolPath 'src']));
 
 % Compile mex file if not exist
-cd([GD.ToolPath 'src\external\intersectPlaneSurf'])
-if ~exist('IntersectPlaneTriangle.mexw64','file')
-    mex('IntersectPlaneTriangle.cpp','-v');
+mexPath = [GD.ToolPath 'src\external\intersectPlaneSurf'];
+if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
+    mex([mexPath '\IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
 end
-cd(CTP);
 
 % Number of cutting planes per cuting box
 GD.Cond.NoPpC = 9;
