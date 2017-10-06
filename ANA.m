@@ -1,4 +1,4 @@
-function [CEA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
+function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
     shaftAxisIdx, neckOrthogonalIdx, varargin)
 %ANA An optimization algorithm for establishing a anatomical neck axis (ANA)
 %
@@ -29,7 +29,7 @@ function [CEA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %     'Verbose' - Logical: Command window output. Default is true.
 %
 % OUTPUT:
-%     CEA - Double [1x6]: A line fitted through the centers of the ellipses
+%     ANA - Double [1x6]: A line fitted through the centers of the ellipses
 %           with minimum dispersion.
 %     ANATFM - Double [4x4]: Transformation of the bone into the neck axis CS
 %
@@ -119,15 +119,17 @@ GD = RoughFineIteration('no handle', GD);
 % Calculate the transformation from the initial bone position into the ANA
 PRM = GD.Results.PlaneRotMat;
 ANATFM = PRM*GD.Subject.TFM;
-% Calculate the anatomical neck axis (CEA) in the ANA system
-CEA = transformLine3d(GD.Results.CenterLine, PRM);
+% Calculate the anatomical neck axis (ANA) in the ANA system
+ANA_ANA = transformLine3d(GD.Results.CenterLine, PRM);
+% Calculate the anatomical neck axis in the input bone system
+ANA = transformLine3d(GD.Results.CenterLine, inv(GD.Subject.TFM));
 
-% Check if the CEA has 2 intersections with the bone:
+% Check if the ANA has 2 intersections with the bone:
 Bone = transformPoint3d(GD.Subject.Mesh, ANATFM);
-[~, ~, IntCEABone] = intersectLineMesh3d(CEA, Bone.vertices, Bone.faces);
-if numel(IntCEABone)~=2
-    warning(['Central elliptic axis (CEA) should have 2 intersection points with the bone surface', ...
-        'But number of intersection points is: ' num2str(numel(IntCEABone)) '!']);
+[~, ~, IntANABone] = intersectLineMesh3d(ANA_ANA, Bone.vertices, Bone.faces);
+if numel(IntANABone)~=2
+    warning(['Anatomical neck axis (ANA) should have 2 intersection points with the bone surface', ...
+        'But number of intersection points is: ' num2str(numel(IntANABone)) '!']);
 end
 
 end

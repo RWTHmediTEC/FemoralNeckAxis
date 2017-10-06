@@ -3,7 +3,7 @@ clearvars; close all; opengl hardware
 % List.f = List.f'; List.p = List.p';
 
 %% Select subject
-Idx = 4;
+Idx = 1;
 
 load('data\F','F')
 
@@ -21,12 +21,12 @@ NeckOrthogonalIdx = F(Idx).LM.NeckOrthogonal;
 
 %% Select different options by commenting 
 % Default mode
-[CEA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, 'Subject', num2str(Idx));
+[ANA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, 'Subject', num2str(Idx));
 % Silent mode
-% [CEA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, ...
-%     NeckOrthogonalIdx, 'Subject', num2str(Idx), 'Visualization', false, 'Verbose', false);
+% [ANA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, ...
+%     NeckOrthogonalIdx, 'Subject', num2str(Idx), 'Visu', false, 'Verbose', false);
 % Other options
-% [CEA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, ...
+% [ANA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, ...
 %     'PlaneVariationRange', 12, 'StepSize', 3);
 
 %% Visualization
@@ -45,9 +45,8 @@ BoneProps.EdgeLighting = 'none';
 BoneProps.FaceLighting = 'gouraud';
 patch(F(Idx).mesh, BoneProps);
 
-% CEA
-CEA_TFM = transformLine3d(CEA, inv(ANATFM));
-drawLine3d(CEA_TFM, 'b');
+% ANA
+drawLine3d(ANA, 'b');
 
 % Light
 light1 = light; light('Position', -1*(get(light1,'Position')));
