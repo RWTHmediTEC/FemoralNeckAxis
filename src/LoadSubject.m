@@ -1,6 +1,5 @@
 function GD = LoadSubject(hObject, GD)
 if ishandle(hObject); GD = guidata(hObject); end
-cd(GD.ToolPath)
 
 if ishandle(hObject)
     % Subject data path

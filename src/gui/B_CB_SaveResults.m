@@ -1,6 +1,5 @@
 function GD = B_CB_SaveResults(hObject, GD)
 if ishandle(hObject); GD = guidata(hObject); end
-cd(GD.ToolPath)
 
 if isfield(GD.Results, 'PlaneRotMat')
     
