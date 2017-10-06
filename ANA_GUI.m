@@ -67,12 +67,11 @@ FontPropsB.FontSize = 0.5;
 %% Controls on the Top of the GUI - LEFT SIDE
 % Entries of the dropdown menue as string
 GD.Subject.Name = Subjects{1};
-DD_String_Subjects = [sprintf('%s|', Subjects{1:end-1,1}), Subjects{end,1}];
 % Subject static text
 uicontrol('Style','text','String','Subject: ','HorizontalAlignment','Right',...
     'Units','normalized','Position',      [0.13-BSX 0.97 BSX/2 BSY],FontPropsA)
 % Subject dropdown menue
-uicontrol('Style', 'popup', 'String',DD_String_Subjects,...
+uicontrol('Style', 'popup', 'String',Subjects',...
     'Units','normalized','Position',      [0.13-BSX*1/2 0.97 BSX BSY],FontPropsB,...
     'Callback', {@DD_CB_Subject, Subjects});
 % Load button
