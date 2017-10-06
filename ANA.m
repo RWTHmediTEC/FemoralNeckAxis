@@ -4,10 +4,16 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %
 % INPUT:
 %   - REQUIRED:
-%     Vertices - Double [Nx3]: A list of points of the femoral neck mesh
-%     Faces - Integer [Mx3]: A list of triangle faces, indexing into the Vertices
-%     Side - Char: 'L' or 'R' femur
-%     ...
+%     vertices - Double [Nx3]: A list of points of the femoral neck mesh
+%     faces - Integer [Mx3]: A list of triangle faces, indexing into the vertices
+%     side - Char: 'L' or 'R' femur
+%     neckAxisIdx - Integer [Mx2]: Vertex indices defining a default 
+%       initial neck axis
+%     shaftAxisIdx - Integer [Mx2]: Vertex indices defining a default 
+%       initial shaft axis
+%     neckOrthogonalIdx - Integer [Mx2]: Vertex indices defining a default 
+%       initial ortogonal to the neck axis in smallest the region of the neck
+%       
 %
 %   - ADDITIONAL
 %     'Subject' - Char: Identification of the subject. Default is 'unnamed'.
@@ -120,13 +126,12 @@ GD = RoughFineIteration('no handle', GD);
 PRM = GD.Results.PlaneRotMat;
 ANATFM = PRM*GD.Subject.TFM;
 % Calculate the anatomical neck axis (ANA) in the ANA system
-ANA_ANA = transformLine3d(GD.Results.CenterLine, PRM);
+% ANA_ANA = transformLine3d(GD.Results.CenterLine, PRM);
 % Calculate the anatomical neck axis in the input bone system
 ANA = transformLine3d(GD.Results.CenterLine, inv(GD.Subject.TFM));
 
 % Check if the ANA has 2 intersections with the bone:
-Bone = transformPoint3d(GD.Subject.Mesh, ANATFM);
-[~, ~, IntANABone] = intersectLineMesh3d(ANA_ANA, Bone.vertices, Bone.faces);
+[~, ~, IntANABone] = intersectLineMesh3d(ANA, GD.Subject.Mesh.vertices, GD.Subject.Mesh.faces);
 if numel(IntANABone)~=2
     warning(['Anatomical neck axis (ANA) should have 2 intersection points with the bone surface', ...
         'But number of intersection points is: ' num2str(numel(IntANABone)) '!']);

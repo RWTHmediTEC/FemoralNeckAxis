@@ -21,12 +21,13 @@ NeckOrthogonalIdx = F(Idx).LM.NeckOrthogonal;
 
 %% Select different options by commenting 
 % Default mode
-[ANA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, 'Subject', num2str(Idx));
+[ANAxis, ANATFM] = ANA(Vertices, Faces, Side, ...
+    NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, 'Subject', num2str(Idx));
 % Silent mode
-% [ANA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, ...
+% [ANAxis, ANATFM] = ANAxis(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, ...
 %     NeckOrthogonalIdx, 'Subject', num2str(Idx), 'Visu', false, 'Verbose', false);
 % Other options
-% [ANA, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, ...
+% [ANAxis, ANATFM] = ANAxis(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, ...
 %     'PlaneVariationRange', 12, 'StepSize', 3);
 
 %% Visualization
@@ -45,8 +46,8 @@ BoneProps.EdgeLighting = 'none';
 BoneProps.FaceLighting = 'gouraud';
 patch(F(Idx).mesh, BoneProps);
 
-% ANA
-drawLine3d(ANA, 'b');
+% ANAxis
+drawLine3d(ANAxis, 'b');
 
 % Light
 light1 = light; light('Position', -1*(get(light1,'Position')));
