@@ -63,7 +63,6 @@ RangeLength_a = length(Range_a);
 RangeLength_b = length(Range_b);
 
 % Variable to save the results
-% R=[];
 R.Dispersion = nan(RangeLength_a,RangeLength_b);
 R.Perimeter = nan(RangeLength_a,RangeLength_b);
 
@@ -165,8 +164,8 @@ for I_a = 1:RangeLength_a
             Center2D(c,:) = NC.P(c).Ell.z;
         end
         
-        % Calculate the mean perimeter of the cuts
-        R.Perimeter(I_a,I_b) = mean([NC.P.length]);
+        % Calculate the min perimeter of the cuts
+        R.Perimeter(I_a,I_b) = min([NC.P.length]);
         % Calculate the Dispersion as Eccentricity Measure
         R.Dispersion(I_a,I_b) = CalculateDispersion(Center2D);
         
@@ -226,7 +225,6 @@ end
 
 %% Results
 if sum(sum(~isnan(R.Dispersion)))>=4
-    % if sum(sum(~isnan(R.Dispersion))) > 3
     if visu == 1
         %% Dispersion plot
         % A representative plot of the dispersion of focus locations
