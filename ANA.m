@@ -117,7 +117,7 @@ end
 GD = RoughFineIteration('no handle', GD);
 
 %% Results
-ANATFM = GD.Results.ANATFM;
+ANATFM = GD.Subject.TFM;
 ANA = GD.Results.ANA;
 
 end

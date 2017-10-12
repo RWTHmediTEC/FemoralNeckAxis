@@ -2,7 +2,7 @@ function GD = B_CB_SaveResults(hObject, GD)
 if ishandle(hObject); GD = guidata(hObject); end
 
 if isfield(GD.Results, 'PlaneRotMat')
-    ANATFM = GD.Results.ANATFM;
+    ANATFM = GD.Subject.TFM;
     ANA = GD.Results.ANA;
     % load(GD.Subject.PathMAT)
     % save(GD.Subject.PathMAT, 'ANATFM', 'CEA', '-append')

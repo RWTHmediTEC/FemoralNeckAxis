@@ -53,18 +53,19 @@ end
 GD.Algorithm3.StepSize = FineStepSize;
 GD = Algorithm3(GD);
 % Calculate the transformation from the initial bone position into the ANA
-GD.Results.ANATFM  = GD.Results.PlaneRotMat*GD.Subject.TFM;
+GD.Subject.TFM  = GD.Results.PlaneRotMat*GD.Subject.TFM;
 % Calculate the anatomical neck axis (ANA) in the ANA system
 % ANA_ANA = transformLine3d(GD.Results.CenterLine, GD.Results.PlaneRotMat);
 % Calculate the anatomical neck axis in the input bone system
-GD.Results.ANA = transformLine3d(GD.Results.CenterLine, inv(GD.Subject.TFM));
+GD.Results.ANA = transformLine3d(GD.Results.CenterLine, ...
+    inv(GD.Results.PlaneRotMat'*GD.Subject.TFM)); % in this case TFM' == inv(TFM)
 % Sanity check
 ANA_Idx = lineToVertexIndices(GD.Results.ANA, GD.Subject.Mesh);
 assert(isequal(GD.Results.CenterLineIdx, ANA_Idx))
 if numel(ANA_Idx)~=2
     warning(['Anatomical neck axis (ANA) should have 2 intersection ' ...
         'points with the bone surface. But number of intersection', ...
-         'points is: ' num2str(numel(IntANABone)) '!']);
+         'points is: ' num2str(numel(ANA_Idx)) '!']);
 end
 if GD.Verbose == 1
     disp('----- Finished Fine Iteration ------------------------------------');

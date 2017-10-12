@@ -89,7 +89,7 @@ for I_a = 1:RangeLength_a
         % (All rotations around the fixed axes / around the global basis)
         %                                       (  Z-Axis      Y-Axis        X-Axis   )
         NC.PRM =    eulerAnglesToRotation3d(    0    , Range_b(I_b), Range_a(I_a));
-        invPRM=NC.PRM'; % in this case transpose == inv
+        invPRM=NC.PRM'; % in this case TFM' == inv(TFM)
         PlaneNormal = transformVector3d([0 0 1], NC.PRM);
         
         % Create cutting plane origins
@@ -217,7 +217,6 @@ for I_a = 1:RangeLength_a
         end
     end
 end
-clear NC
 
 if GD.Verbose == 1
     % Stop updated command window information
@@ -273,7 +272,7 @@ if sum(sum(~isnan(R.Dispersion)))>=4
     MinNC = CutVariations{minD.I_a,minD.I_b};
     
     % The rotation matrix for the plane variation with minimum Dispersion
-    GD.Results.PlaneRotMat = MinNC.PRM'; % in this case transpose == inv
+    GD.Results.PlaneRotMat = MinNC.PRM'; % in this case TFM' == inv(TFM)
     
     % Calculate centers in 3D for minimum Dispersion
     EllpCen3D = nan(NoP,3);
