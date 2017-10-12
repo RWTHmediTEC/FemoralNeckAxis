@@ -88,10 +88,9 @@ for I_a = 1:RangeLength_a
         % Calculate the Rotation Matrix for the plane variation
         % (All rotations around the fixed axes / around the global basis)
         %                                       (  Z-Axis      Y-Axis        X-Axis   )
-        PRM =    eulerAnglesToRotation3d(    0    , Range_b(I_b), Range_a(I_a));
-        invPRM=PRM';
-        PlaneNormal = transformVector3d([0 0 1],PRM);
-        NC.RotTFM = affine3d(PRM);
+        NC.PRM =    eulerAnglesToRotation3d(    0    , Range_b(I_b), Range_a(I_a));
+        invPRM=NC.PRM'; % in this case transpose == inv
+        PlaneNormal = transformVector3d([0 0 1], NC.PRM);
         
         % Create cutting plane origins
         NC.Origin = [0 0 0];
@@ -100,7 +99,7 @@ for I_a = 1:RangeLength_a
             % direction of the plane normal, e.g. for NoPpC = 9:
             % -4, -3, -2, -1, 0, +1, +2, +3, +4
             NC.PlaneOrigins(p,:) = NC.Origin+(-(0.5+NoP/2)+p)*PlaneNormal;
-        end; clear p;
+        end
         
         % Create NoP Neck Contour Profiles (NC.P)
         tempContour = IntersectMeshPlaneParfor(Bone, NC.PlaneOrigins, PlaneNormal);
@@ -114,9 +113,7 @@ for I_a = 1:RangeLength_a
                 NC.P(c).xyz(end+1,:) = NC.P(c).xyz(1,:);
             end
             % Rotation back, parallel to XY-Plane (Default Neck Plane)
-%             tempxyz = transformPoint3d(NC.P(c).xyz, invPRM);
-            NC.P(c).xyz = transformPointsForward(NC.RotTFM, NC.P(c).xyz);
-%             assert(isequal(NC.P(c).xyz,tempxyz))
+            NC.P(c).xyz = transformPoint3d(NC.P(c).xyz, invPRM);
             % If the contour is sorted clockwise
             if varea(NC.P(c).xyz(:,1:2)') < 0 % The contour has to be closed
                 % Sort the contour counter-clockwise
@@ -137,7 +134,7 @@ for I_a = 1:RangeLength_a
             end
             % Calculate length of the contour
             NC.P(c).length=polygonLength(NC.P(c).xyz(:,1:2));
-        end; clear c;       
+        end       
         
         %% Algorithm 2
         % A least-squares fitting algorithm for extracting geometric measures
@@ -153,7 +150,7 @@ for I_a = 1:RangeLength_a
             NC.P(c).Ell.a = tempEll2D(3,c);
             NC.P(c).Ell.b = tempEll2D(4,c);
             NC.P(c).Ell.g = tempEll2D(5,c);
-        end; clear c     
+        end     
         
         %% Algorithm 3 - Part 2
         % An optimization algorithm for establishing the anatomical neck axis
@@ -166,7 +163,7 @@ for I_a = 1:RangeLength_a
             % Posterior Focus (pf): Foci2D(1,:), Anterior Focus (af): Foci2D(2,:)
             NC.P(c).Ell.pf = Foci2D(1,:);
             Center2D(c,:) = NC.P(c).Ell.z;
-        end; clear c
+        end
         
         % Calculate the mean perimeter of the cuts
         R.Perimeter(I_a,I_b) = mean([NC.P.length]);
@@ -183,7 +180,7 @@ for I_a = 1:RangeLength_a
                 % Plot the ellipses in 2D
                 for c=1:NoP
                     VisualizeEll2D(rSP, NC.P(c), NC.Color);
-                end; clear c
+                end
                 hold(rSP,'off')
             end
             
@@ -199,8 +196,8 @@ for I_a = 1:RangeLength_a
             % Plot contour-parts & ellipses
             if EllipsePlot == 1
                 for c=1:NoP
-                    VisualizeContEll3D(lSP, NC.P(c), NC.RotTFM, NC.Color);
-                end; clear c
+                    VisualizeContEll3D(lSP, NC.P(c), NC.PRM, NC.Color);
+                end
             end
             drawnow
         end
@@ -218,8 +215,8 @@ for I_a = 1:RangeLength_a
                 char(945) ' = ' num2str(Range_a(I_a)) '° & '...
                 char(946) ' = ' num2str(Range_b(I_b)) '°.'],'timestamp');
         end
-    end; clear I_b
-end; clear I_a
+    end
+end
 clear NC
 
 if GD.Verbose == 1
@@ -276,15 +273,15 @@ if sum(sum(~isnan(R.Dispersion)))>=4
     MinNC = CutVariations{minD.I_a,minD.I_b};
     
     % The rotation matrix for the plane variation with minimum Dispersion
-    GD.Results.PlaneRotMat = inv(MinNC.RotTFM.T);
+    GD.Results.PlaneRotMat = MinNC.PRM'; % in this case transpose == inv
     
     % Calculate centers in 3D for minimum Dispersion
     EllpCen3D = nan(NoP,3);
     for c=1:NoP
         % Save the ellipse center for the Line fit
         EllpCen3D(c,:) = CalculatePointInEllipseIn3D(...
-            MinNC.P(c).Ell.z, MinNC.P(c).xyz(1,3), MinNC.RotTFM);
-    end; clear c
+            MinNC.P(c).Ell.z, MinNC.P(c).xyz(1,3), MinNC.PRM);
+    end
     
     % Calculate axis through the posterior foci
     GD.Results.CenterLine = fitLine3d(EllpCen3D);
@@ -300,7 +297,7 @@ if sum(sum(~isnan(R.Dispersion)))>=4
         % Results in the main figure
         % Plot the cutting plane with minimum Dispersion (Left subplot)
         ClearPlot(lSP, {'Patch','Scatter','Line'})
-        PlaneNormal = transformVector3d([0 0 1],PRM);
+        PlaneNormal = transformVector3d([0 0 1],MinNC.PRM);
         drawPlane3d(lSP, createPlane([0 0 0], PlaneNormal),...
             'FaceColor','w','FaceAlpha', 0.5);
         
@@ -311,7 +308,7 @@ if sum(sum(~isnan(R.Dispersion)))>=4
         % Plot the ellipses in 2D
         for c=1:NoP
             VisualizeEll2D(rSP, MinNC.P(c), MinNC.Color);
-        end; clear c
+        end
         hold(rSP,'off')
         
         % Delete old 3D ellipses & contours, if exist
@@ -319,8 +316,8 @@ if sum(sum(~isnan(R.Dispersion)))>=4
         hold(lSP,'on')
         % Plot contours, ellipses & foci in 3D for minimum Dispersion
         for c=1:NoP
-            VisualizeContEll3D(lSP, MinNC.P(c), MinNC.RotTFM, MinNC.Color);
-        end; clear c
+            VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, MinNC.Color);
+        end
         
         % Plot centers in 3D for minimum Dispersion
         scatter3(lSP, EllpCen3D(:,1),EllpCen3D(:,2),EllpCen3D(:,3),'b','filled', 'tag', 'CEA')
