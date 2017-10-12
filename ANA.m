@@ -78,7 +78,6 @@ if GD.Visualization == 1
         set(GUIFigure,'OuterPosition',MonitorsPos(2,:));
     end
     GD.Figure.Handle = GUIFigure;
-    view(3)
     
     %% Subject subplot
     GD.Figure.LeftSpHandle = subplot('Position', [0.05, 0.1, 0.4, 0.8],...

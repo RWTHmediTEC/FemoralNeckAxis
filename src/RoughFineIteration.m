@@ -3,7 +3,7 @@ if ishandle(hObject); GD = guidata(hObject); end
 
 % Variable to save the rotation values during the rough iterations
 GD.Results.OldDMin(1) = 0; GD.Results.OldDMin(2) = 0;
-GD.Results.FigHandle = [];
+GD.Results.AxHandle = nan;
 
 
 %% Rough Iteration
@@ -18,10 +18,12 @@ while GD.Iteration.Rough == 1
     GD.Subject.TFM = GD.Results.PlaneRotMat*GD.Subject.TFM;
     if GD.Visualization == 1
         % Clear left subplot
-        figure(GD.Figure.Handle); subplot(GD.Figure.LeftSpHandle);
-        title(''); delete(GD.Subject.PatchHandle); delete(GD.DSPlane.Handle);
+        title(GD.Figure.LeftSpHandle,'');
+        delete(GD.Subject.PatchHandle);
+        delete(GD.DNPlaneHandle);
         % Plot bone with newest transformation
-        GD = VisualizeSubjectBone(GD); drawnow;
+        GD = VisualizeSubjectBone(GD);
+        drawnow;
     end
 end
 if GD.Verbose == 1

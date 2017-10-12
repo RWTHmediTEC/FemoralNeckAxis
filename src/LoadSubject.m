@@ -1,7 +1,8 @@
 function GD = LoadSubject(hObject, GD)
-if ishandle(hObject); GD = guidata(hObject); end
 
 if ishandle(hObject)
+    GD = guidata(hObject);
+    
     % Subject data path
     GD.Subject.PathMAT = [GD.ToolPath GD.Subject.DataPath];
     
@@ -47,30 +48,31 @@ GD.Subject.ViewVector = transformVector3d(GD.Subject.ViewVector, GD.Subject.TFM)
 
 if GD.Visualization == 1
     %% Configure subplots
-    figure(GD.Figure.Handle);
     set(GD.Figure.Handle, 'Name', [GD.Subject.Side ' femur of subject: ' GD.Subject.Name]);
     % Clear right subplot
-    subplot(GD.Figure.RightSpHandle); cla reset;
-    axis on; axis equal; grid on; xlabel('X [mm]'); ylabel('Y [mm]');
-    set(GD.Figure.RightSpHandle, 'Color', GD.Figure.Color);
+    rSP = GD.Figure.RightSpHandle;
+    cla(rSP, 'reset');
+    axis(rSP,'on','equal');
+    grid(rSP,'on');
+    xlabel(rSP,'X [mm]'); ylabel(rSP,'Y [mm]');
+    set(rSP, 'Color', GD.Figure.Color);
     
     % Left subject subplot and properties
-    subplot(GD.Figure.LeftSpHandle);
-    cla reset;
-    axis on; xlabel('X [mm]'); ylabel('Y [mm]'); zlabel('Z [mm]');
-    set(GD.Figure.LeftSpHandle,'Color',GD.Figure.Color);
-    light1 = light; light('Position', -1*(get(light1,'Position')));
-    daspect([1 1 1])
+    lSP = GD.Figure.LeftSpHandle;
+    cla(lSP,'reset');
+    axis(lSP,'on');
+    xlabel(lSP,'X [mm]'); ylabel(lSP,'Y [mm]'); zlabel(lSP,'Z [mm]');
+    set(lSP,'Color',GD.Figure.Color);
+    light1 = light(lSP); light(lSP, 'Position', -1*(get(light1,'Position')));
     cameratoolbar('SetCoordSys','none')
     
     %% Visualize Subject Bone with the Default Neck Plane (DNP)
     GD = VisualizeSubjectBone(GD);
-    
-    %% Find most posterior points of the condyles (mpCPts) & plot the cutting boxes
+    axis(lSP,'equal');
     GD = SetStartSetup(GD);
     
     % Plot a dot into the Point of Origin
-    scatter3(0,0,0,'k','filled')
+    scatter3(lSP, 0,0,0,'k','filled')
 end
 
 if ishandle(hObject); guidata(hObject,GD); end

@@ -14,17 +14,17 @@ function GD = Algorithm3(GD)
 %   AUTHOR: MCMF
 %
 
-if GD.Visualization == 1
+visu = GD.Visualization;
+if visu == 1
     % Figure & subplot handles
-    H.Fig = GD.Figure.Handle;
-    H.lSP = GD.Figure.LeftSpHandle;
-    H.rSP = GD.Figure.RightSpHandle;
+    lSP = GD.Figure.LeftSpHandle;
+    rSP = GD.Figure.RightSpHandle;
     
     % Clear subplots
     % Right
-    figure(H.Fig); subplot(H.rSP); title(''); cla
+    title(rSP,''); cla(rSP)
     % Left
-    figure(H.Fig); subplot(H.lSP); title(''); ClearPlot(H.Fig, H.lSP, {'Patch','Scatter','Line'})
+    title(lSP,''); ClearPlot(lSP, {'Patch','Scatter','Line'})
 end
 
 %% Settings
@@ -184,34 +184,33 @@ for I_a = 1:RangeLength_a
         % Calculate the Dispersion as Eccentricity Measure
         R.Dispersion(I_a,I_b) = CalculateDispersion(Center2D);
         
-        if GD.Visualization == 1
+        if visu == 1
             %% Visualization during iteration
             % RIGHT subplot: Plot the ellipses in 2D in the XY-plane
             if EllipsePlot == 1
                 % Clear right subplot
-                figure(H.Fig); subplot(H.rSP); cla;
-                hold on;
+                cla(rSP);
+                hold(rSP,'on')
                 % Plot the ellipses in 2D
                 for c=1:NoP
-                    VisualizeEll2D(NC.P(c), NC.Color);
+                    VisualizeEll2D(rSP, NC.P(c), NC.Color);
                 end; clear c
-                hold off
+                hold(rSP,'off')
             end
             
             % LEFT Subplot: Plot plane variation, contour-parts, ellipses in 3D
-            figure(H.Fig); subplot(H.lSP);
-            ClearPlot(H.Fig, H.lSP, {'Patch','Scatter','Line'})
+            ClearPlot(lSP, {'Patch','Scatter','Line'})
             % Plot the plane variation
             if PlotPlaneVariation == 1
-                title(['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
+                title(lSP, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
                     '\beta = '  num2str(Range_b(I_b)) '°.'])
-                drawPlane3d(createPlane([0, 0, 0], PlaneNormal),...
+                drawPlane3d(lSP, createPlane([0, 0, 0], PlaneNormal),...
                     'FaceColor','g','FaceAlpha', 0.5);
             end
             % Plot contour-parts & ellipses
             if EllipsePlot == 1
                 for c=1:NoP
-                    VisualizeContEll3D(NC.P(c), NC.RotTFM, NC.Color);
+                    VisualizeContEll3D(lSP, NC.P(c), NC.RotTFM, NC.Color);
                 end; clear c
             end
             drawnow
@@ -219,8 +218,10 @@ for I_a = 1:RangeLength_a
         
         % Save the calculation in cell array
         CutVariations{I_a,I_b} = NC;
+        
         % Count the variation
         PV_Counter=PV_Counter+1;
+        
         if GD.Verbose == 1
             % Variation info in command window
             dispstat(['Plane variation ' num2str(PV_Counter) ' of ' ...
@@ -241,22 +242,25 @@ end
 %% Results
 if sum(sum(~isnan(R.Dispersion)))>=4
     % if sum(sum(~isnan(R.Dispersion))) > 3
-    if GD.Visualization == 1
+    if visu == 1
         %% Dispersion plot
         % A representative plot of the dispersion of focus locations
         % as a function of alpha (a) and beta (b).
-        if ishandle(GD.Results.FigHandle)
-            figure(GD.Results.FigHandle)
-            hold on
-        else
-            GD.Results.FigHandle = figure('Name', GD.Subject.Name, 'Color', 'w');
+        if ~ishandle(GD.Results.AxHandle)
+            figH_Res = figure('Name', GD.Subject.Name, 'Color', 'w');
+            axH_Res = axes(figH_Res);
+            axis(axH_Res, 'equal', 'tight'); view(axH_Res,3);
+            xlabel(axH_Res,'\alpha');
+            ylabel(axH_Res,'\beta');
+            zlabel(axH_Res,'Dispersion [mm]')
+            title(axH_Res, 'Dispersion of focus locations as a function of \alpha & \beta')
+            GD.Results.AxHandle = axH_Res;
         end
-        xlabel('\alpha');ylabel('\beta');zlabel('Dispersion [mm]')
-        title('Dispersion of focus locations as a function of \alpha & \beta')
+        hold(GD.Results.AxHandle,'on')
         [Surf2.X, Surf2.Y] = meshgrid(Range_a, Range_b);
         Surf2.X = Surf2.X + GD.Results.OldDMin(1);
         Surf2.Y = Surf2.Y + GD.Results.OldDMin(2);
-        surf(Surf2.X', Surf2.Y', R.Dispersion)
+        surf(GD.Results.AxHandle, Surf2.X', Surf2.Y', R.Dispersion)
     end
        
     % Searching the cutting plane with minimum Dispersion
@@ -302,37 +306,36 @@ if sum(sum(~isnan(R.Dispersion)))>=4
     GD.Results.Ell.b = EllResults(2,:);
     
     %% Visualization of Results
-    if GD.Visualization == 1
+    if visu == 1
         % Results in the main figure
         % Plot the cutting plane with minimum Dispersion (Left subplot)
-        figure(H.Fig); subplot(H.lSP); ClearPlot(H.Fig, H.lSP, {'Patch','Scatter','Line'})
+        ClearPlot(lSP, {'Patch','Scatter','Line'})
         PlaneNormal = [0, 0, 1]*GD.Results.PlaneRotMat(1:3,1:3)';
-        drawPlane3d(createPlane([0, 0, 0], PlaneNormal),'FaceColor','w','FaceAlpha', 0.5);
+        drawPlane3d(lSP, createPlane([0, 0, 0], PlaneNormal),'FaceColor','w','FaceAlpha', 0.5);
         
         % Plot the ellipses in 2D (Right subplot) for minimum Dispersion
-        figure(H.Fig); subplot(H.rSP); cla;
-        title(['Minimum Dispersion of the centers: ' num2str(minD.Value) ' mm'])
-        hold on;
+        cla(rSP);
+        title(rSP, ['Minimum Dispersion of the centers: ' num2str(minD.Value) ' mm'])
+        hold(rSP,'on')
         % Plot the ellipses in 2D
         for c=1:NoP
-            VisualizeEll2D(MinNC.P(c), MinNC.Color);
+            VisualizeEll2D(rSP, MinNC.P(c), MinNC.Color);
         end; clear c
-        hold off
+        hold(rSP,'off')
         
         % Delete old 3D ellipses & contours, if exist
-        figure(H.Fig); subplot(H.lSP);
-        title('Line fit through the centers for minimum Dispersion')
-        hold on
+        title(lSP, 'Line fit through the centers for minimum Dispersion')
+        hold(lSP,'on')
         % Plot contours, ellipses & foci in 3D for minimum Dispersion
         for c=1:NoP
-            VisualizeContEll3D(MinNC.P(c), MinNC.RotTFM, MinNC.Color);
+            VisualizeContEll3D(lSP, MinNC.P(c), MinNC.RotTFM, MinNC.Color);
         end; clear c
         
         % Plot centers in 3D for minimum Dispersion
-        scatter3(EllpCen3D(:,1),EllpCen3D(:,2),EllpCen3D(:,3),'b','filled', 'tag', 'CEA')
+        scatter3(lSP, EllpCen3D(:,1),EllpCen3D(:,2),EllpCen3D(:,3),'b','filled', 'tag', 'CEA')
         
         % Plot axis through the centers for minimum Dispersion
-        drawLine3d(GD.Results.CenterLine, 'color','b', 'tag','CEA');
+        drawLine3d(lSP, GD.Results.CenterLine, 'color','b', 'tag','CEA');
         
         % Enable the Save button
         if isfield(GD.Results, 'B_H_SaveResults')
