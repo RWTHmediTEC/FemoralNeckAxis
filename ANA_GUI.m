@@ -16,7 +16,7 @@ if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
     mex([mexPath '\IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
 end
 
-% Number of cutting planes 
+% Number of cutting planes
 GD.Cond.NoPpC = 9;
 
 %% Figure
@@ -24,9 +24,12 @@ GD.Verbose = true;
 GD.Visualization = true;
 GD.Figure.Color = [1 1 1];
 MonitorsPos = get(0,'MonitorPositions');
-GUIFigure = figure('Units','pixels',...
-    'Color',GD.Figure.Color,'ToolBar','figure',...
-    'WindowScrollWheelFcn',@M_CB_Zoom,'WindowButtonDownFcn',@M_CB_RotateWithLeftMouse,...
+GUIFigure = figure(...
+    'Units','pixels',...
+    'Color',GD.Figure.Color,...
+    'ToolBar','figure',...
+    'WindowScrollWheelFcn',@M_CB_Zoom,...
+    'WindowButtonDownFcn',@M_CB_RotateWithLeftMouse,...
     'renderer','opengl');
 if     size(MonitorsPos,1) == 1
     set(GUIFigure,'OuterPosition',MonitorsPos(1,:));
@@ -55,7 +58,6 @@ BSX = 0.12; BSY = 0.023;
 %Font properies
 FontPropsA.FontUnits = 'normalized';
 FontPropsA.FontSize = 0.8;
-
 FontPropsB.FontUnits = 'normalized';
 FontPropsB.FontSize = 0.5;
 
@@ -74,7 +76,8 @@ uicontrol('Units','normalized','Position',[0.13+BSX*1/2 0.97 BSX BSY],FontPropsA
     'String','Load','Callback',{@LoadSubject});
 % Start button
 uicontrol('Units','normalized','Position',[0.13+BSX*3/2 0.97 BSX BSY],FontPropsA,...
-        'String','Start Calculation','Callback',@RoughFineIteration);
+    'String','Start Calculation','Callback',@RoughFineIteration);
+
 
 %% Controls on the Top of the GUI - RIGHT SIDE
 GD.Algorithm3.EllipsePlot = 0;
@@ -122,7 +125,7 @@ uicontrol('Units','normalized','Position',[0.25+BSX*1/2 0.01 BSX BSY/2],FontProp
 %% Controls on the Bottom of the GUI - RIGHT SIDE
 % Save button
 GD.Results.B_H_SaveResults = ...
-uicontrol('Units','normalized','Position',[0.75-BSX*1/2 0.01 BSX BSY],FontPropsA,...
+    uicontrol('Units','normalized','Position',[0.75-BSX*1/2 0.01 BSX BSY],FontPropsA,...
     'String','Save Results','Enable','off','Callback',@B_CB_SaveResults);
 
 %% Guidata to share data among callbacks

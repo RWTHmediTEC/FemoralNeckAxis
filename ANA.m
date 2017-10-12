@@ -116,21 +116,9 @@ end
 % Start rough/fine iteration process
 GD = RoughFineIteration('no handle', GD);
 
-%% Check results
-% Calculate the transformation from the initial bone position into the ANA
-PRM = GD.Results.PlaneRotMat;
-ANATFM = PRM*GD.Subject.TFM;
-% Calculate the anatomical neck axis (ANA) in the ANA system
-% ANA_ANA = transformLine3d(GD.Results.CenterLine, PRM);
-% Calculate the anatomical neck axis in the input bone system
-ANA = transformLine3d(GD.Results.CenterLine, inv(GD.Subject.TFM));
-
-% Check if the ANA has 2 intersections with the bone:
-[~, ~, IntANABone] = intersectLineMesh3d(ANA, GD.Subject.Mesh.vertices, GD.Subject.Mesh.faces);
-if numel(IntANABone)~=2
-    warning(['Anatomical neck axis (ANA) should have 2 intersection points with the bone surface', ...
-        'But number of intersection points is: ' num2str(numel(IntANABone)) '!']);
-end
+%% Results
+ANATFM = GD.Results.ANATFM;
+ANA = GD.Results.ANA;
 
 end
 
