@@ -34,8 +34,8 @@ NeckOrthogonalIdx = F(Idx).LM.NeckOrthogonal;
 figure('Units','pixels','Color','w','ToolBar','figure',...
 'WindowScrollWheelFcn',@M_CB_Zoom,'WindowButtonDownFcn',@M_CB_RotateWithLeftMouse,...
     'renderer','opengl');
-axes('Color','w'); axis on; xlabel('X [mm]'); ylabel('Y [mm]'); zlabel('Z [mm]');
-daspect([1 1 1])
+axes('Color','w'); axis on equal;
+xlabel('X [mm]'); ylabel('Y [mm]'); zlabel('Z [mm]');
 cameratoolbar('SetCoordSys','none')
 
 % Bone

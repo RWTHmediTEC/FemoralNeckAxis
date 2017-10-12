@@ -69,7 +69,6 @@ if GD.Visualization == 1
     %% Visualize Subject Bone with the Default Neck Plane (DNP)
     GD = VisualizeSubjectBone(GD);
     axis(lSP,'equal');
-    GD = SetStartSetup(GD);
     
     % Plot a dot into the Point of Origin
     scatter3(lSP, 0,0,0,'k','filled')

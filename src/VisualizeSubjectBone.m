@@ -20,7 +20,7 @@ planeProps.EdgeColor = 'none';
 planeProps.HandleVisibility = 'Off';
 planeProps.FaceColor = 'k';
 DNPlane=createPlane([0,0,0], [0,0,1]);
-GD.DNPlaneHandle = drawPlane3d(lSP, DNPlane, planeProps);
+GD.DNPlaneHandle = drawPlatform(lSP, DNPlane, 100, planeProps);
 
 %% Set view to a unified camera position
 set(lSP,'CameraTarget',[0 0 0]);

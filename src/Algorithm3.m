@@ -54,7 +54,7 @@ Bone = transformPoint3d(GD.Subject.Mesh, GD.Subject.TFM);
 NoP = GD.Cond.NoPpC;
 
 % Neck Cuts (NC)
-NC.Color = 'm';
+% NC = [];
 
 % Plane variation loop counter
 PV_Counter = 0;
@@ -178,7 +178,7 @@ for I_a = 1:RangeLength_a
                 hold(rSP,'on')
                 % Plot the ellipses in 2D
                 for c=1:NoP
-                    VisualizeEll2D(rSP, NC.P(c), NC.Color);
+                    VisualizeEll2D(rSP, NC.P(c), 'm');
                 end
                 hold(rSP,'off')
             end
@@ -189,13 +189,13 @@ for I_a = 1:RangeLength_a
             if PlotPlaneVariation == 1
                 title(lSP, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
                     '\beta = '  num2str(Range_b(I_b)) '°.'])
-                drawPlane3d(lSP, createPlane([0, 0, 0], PlaneNormal),...
+                drawPlatform(lSP, createPlane([0, 0, 0], PlaneNormal),100,...
                     'FaceColor','g','FaceAlpha', 0.5);
             end
             % Plot contour-parts & ellipses
             if EllipsePlot == 1
                 for c=1:NoP
-                    VisualizeContEll3D(lSP, NC.P(c), NC.PRM, NC.Color);
+                    VisualizeContEll3D(lSP, NC.P(c), NC.PRM, 'm');
                 end
             end
             drawnow
@@ -295,7 +295,7 @@ if sum(sum(~isnan(R.Dispersion)))>=4
         % Plot the cutting plane with minimum Dispersion (Left subplot)
         ClearPlot(lSP, {'Patch','Scatter','Line'})
         PlaneNormal = transformVector3d([0 0 1],MinNC.PRM);
-        drawPlane3d(lSP, createPlane([0 0 0], PlaneNormal),...
+        drawPlatform(lSP, createPlane([0 0 0], PlaneNormal),100,...
             'FaceColor','w','FaceAlpha', 0.5);
         
         % Plot the ellipses in 2D (Right subplot) for minimum Dispersion
@@ -304,7 +304,7 @@ if sum(sum(~isnan(R.Dispersion)))>=4
         hold(rSP,'on')
         % Plot the ellipses in 2D
         for c=1:NoP
-            VisualizeEll2D(rSP, MinNC.P(c), MinNC.Color);
+            VisualizeEll2D(rSP, MinNC.P(c), 'm');
         end
         hold(rSP,'off')
         
@@ -313,7 +313,7 @@ if sum(sum(~isnan(R.Dispersion)))>=4
         hold(lSP,'on')
         % Plot contours, ellipses & foci in 3D for minimum Dispersion
         for c=1:NoP
-            VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, MinNC.Color);
+            VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, 'm');
         end
         
         % Plot centers in 3D for minimum Dispersion

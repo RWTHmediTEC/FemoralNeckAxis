@@ -18,7 +18,6 @@ if isfield(GD.Subject,'PatchHandle')
     GD.Subject.TFM = TFM*GD.Subject.TFM;
     
     GD = VisualizeSubjectBone(GD);
-    GD = SetStartSetup(GD);
     
 else
     uiwait(errordlg('Load a bone!','modal'));
