@@ -42,6 +42,9 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 % EXAMPLE:
 %     Run the file 'ANA_Example.m'
 %
+% TODO/IDEAS:
+%   - Use isthmus of the neck as starting point
+%
 % AUTHOR:
 %     MCMF
 
