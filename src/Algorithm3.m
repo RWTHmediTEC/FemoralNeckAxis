@@ -236,7 +236,7 @@ if sum(sum(~isnan(R.Dispersion)))>=4
             xlabel(axH_Res,'\alpha');
             ylabel(axH_Res,'\beta');
             zlabel(axH_Res,'Dispersion [mm]')
-            title(axH_Res, 'Dispersion of focus locations as a function of \alpha & \beta')
+            title(axH_Res, 'Dispersion of the centers as function of \alpha & \beta')
             GD.Results.AxHandle = axH_Res;
         end
         hold(GD.Results.AxHandle,'on')
