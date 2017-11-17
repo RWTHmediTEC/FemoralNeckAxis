@@ -17,7 +17,7 @@ if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
 end
 
 % Number of cutting planes
-GD.Cond.NoPpC = 9;
+GD.Cond.NoPpC = 15;
 
 %% Figure
 GD.Verbose = true;
@@ -83,7 +83,7 @@ uicontrol('Units','normalized','Position',[0.13+BSX*3/2 0.97 BSX BSY],FontPropsA
 GD.Algorithm3.EllipsePlot = 0;
 uicontrol('Style','checkbox','Units','normalized',...
     'Position',[0.75-BSX*3/2 0.97 BSX BSY],FontPropsB,...
-    'String','Alg. 3: Plot Ellipses & Foci',...
+    'String','Alg. 3: Plot 2D Info',...
     'Callback',@CB_CB_EllipsePlot,'Value',0);
 GD.Algorithm3.PlaneVariaton = 0;
 uicontrol('Style','checkbox','Units','normalized',...

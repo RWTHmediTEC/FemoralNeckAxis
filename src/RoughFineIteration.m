@@ -19,6 +19,7 @@ while GD.Iteration.Rough == 1
     if GD.Visualization == 1
         % Clear left subplot
         title(GD.Figure.LeftSpHandle,'');
+        ClearPlot(GD.Figure.LeftSpHandle, {'Patch','Scatter','Line'})
         delete(GD.Subject.PatchHandle);
         delete(GD.DNPlaneHandle);
         % Plot bone with newest transformation
@@ -44,21 +45,17 @@ OldStepSize = GD.Algorithm3.StepSize;
 FineStepSize = 0.5;
 if GD.Algorithm3.StepSize >= 1
     % The new Plane Variation Range is the Step Size of the Rough
-    % Iteration minus the fine Step Size
-    GD.Algorithm3.PlaneVariationRange = GD.Algorithm3.StepSize - FineStepSize;
+    GD.Algorithm3.PlaneVariationRange = GD.Algorithm3.StepSize;
 else
     % Minimal Plane Variation Range is the fine Step Size.
     GD.Algorithm3.PlaneVariationRange = FineStepSize;
 end
 GD.Algorithm3.StepSize = FineStepSize;
 GD = Algorithm3(GD);
-% Calculate the transformation from the initial bone position into the ANA
-GD.Subject.TFM  = GD.Results.PlaneRotMat*GD.Subject.TFM;
 % Calculate the anatomical neck axis (ANA) in the ANA system
 % ANA_ANA = transformLine3d(GD.Results.CenterLine, GD.Results.PlaneRotMat);
 % Calculate the anatomical neck axis in the input bone system
-GD.Results.ANA = transformLine3d(GD.Results.CenterLine, ...
-    inv(GD.Results.PlaneRotMat'*GD.Subject.TFM)); % in this case TFM' == inv(TFM)
+GD.Results.ANA = transformLine3d(GD.Results.CenterLine, inv(GD.Subject.TFM));
 % Sanity check
 ANA_Idx = lineToVertexIndices(GD.Results.ANA, GD.Subject.Mesh);
 assert(isequal(GD.Results.CenterLineIdx, ANA_Idx))
@@ -67,6 +64,10 @@ if numel(ANA_Idx)~=2
         'points with the bone surface. But number of intersection', ...
          'points is: ' num2str(numel(ANA_Idx)) '!']);
 end
+
+% Calculate the transformation from the initial bone position into the ANA
+GD.Subject.TFM  = GD.Results.PlaneRotMat*GD.Subject.TFM;
+
 if GD.Verbose == 1
     disp('----- Finished Fine Iteration ------------------------------------');
     disp(' ');

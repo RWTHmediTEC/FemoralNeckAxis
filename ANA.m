@@ -65,7 +65,7 @@ if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
 end
 
 % Number of cutting planes per cuting box
-GD.Cond.NoPpC = 9;
+GD.Cond.NoPpC = 15;
 
 if GD.Visualization == 1
     %% Figure
