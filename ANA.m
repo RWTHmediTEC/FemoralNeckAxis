@@ -1,6 +1,6 @@
 function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
     shaftAxisIdx, neckOrthogonalIdx, varargin)
-%ANA An optimization algorithm for establishing a anatomical neck axis (ANA)
+%ANA An optimization algorithm for establishing an anatomical neck axis (ANA)
 %
 % INPUT:
 %   - REQUIRED:
@@ -13,9 +13,8 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %       initial shaft axis
 %     neckOrthogonalIdx - Integer [Mx2]: Vertex indices defining a default 
 %       initial ortogonal to the neck axis in smallest the region of the neck
-%       
-%
-%   - ADDITIONAL
+%     
+%   - ADDITIONAL:
 %     'Subject' - Char: Identification of the subject. Default is 'unnamed'.
 %     'PlaneVariationRange' - Integer [1x1]: Defines the size of the search
 %                             field of the rough iterations. Default value
@@ -45,8 +44,11 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 % TODO/IDEAS:
 %   - Use isthmus of the neck as starting point
 %
-% AUTHOR:
-%     MCMF
+% AUTHOR: Maximilian C. M. Fischer
+% 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
+% VERSION: 1.0.0
+% DATE: 2017-12-19
+% LICENSE: CC BY-SA 4.0
 
 % Validate inputs
 [Subject, PlaneVariationRange, StepSize, GD.Visualization, GD.Verbose] = ...

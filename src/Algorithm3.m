@@ -45,7 +45,7 @@ PlotPlaneVariation = GD.Algorithm3.PlaneVariaton;
 % Plot Ellipses & Foci for each plane variation into the GUI figure
 EllipsePlot = GD.Algorithm3.EllipsePlot;
 
-%% START OF THE FRAMEWORK BY LI -------------------------------------------
+%% START OF THE FRAMEWORK -------------------------------------------------
 % Algorithm 3 - Part 1
 % An optimization algorithm for establishing a anatomical neck axis (ANA)
 
@@ -88,8 +88,8 @@ for I_a = 1:RangeLength_a
         
         % Calculate the Rotation Matrix for the plane variation
         % (All rotations around the fixed axes / around the global basis)
-        %                                       (  Z-Axis      Y-Axis        X-Axis   )
-        NC.PRM =    eulerAnglesToRotation3d(    0    , Range_b(I_b), Range_a(I_a));
+        %                               (  Z-Axis      Y-Axis        X-Axis   )
+        NC.PRM = eulerAnglesToRotation3d(    0    , Range_b(I_b), Range_a(I_a));
         invPRM=NC.PRM'; % in this case TFM' == inv(TFM)
         PlaneNormal = transformVector3d([0 0 1], NC.PRM);
         
