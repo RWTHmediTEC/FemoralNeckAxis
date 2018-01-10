@@ -42,7 +42,7 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %     Run the file 'ANA_Example.m'
 %
 % TODO/IDEAS:
-%   - Use isthmus of the neck as starting point
+%   - Parse variable 'Objective' in Algorithm3 and NoCP
 %
 % AUTHOR: Maximilian C. M. Fischer
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University

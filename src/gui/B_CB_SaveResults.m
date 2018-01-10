@@ -3,11 +3,9 @@ if ishandle(hObject); GD = guidata(hObject); end
 
 if isfield(GD.Results, 'PlaneRotMat')
     ANATFM = GD.Subject.TFM;
-    ANA = GD.Results.ANA;
-    % load(GD.Subject.PathMAT)
-    % save(GD.Subject.PathMAT, 'ANATFM', 'CEA', '-append')
-    % disp('Results saved.')
-    disp('Save function is not working at the moment')
+    ANAxis = GD.Results.ANA;
+    save('ANAresults', 'ANATFM', 'ANAxis')
+    disp('Results saved.')
 else
     uiwait(errordlg('There are no results to save'));
 end

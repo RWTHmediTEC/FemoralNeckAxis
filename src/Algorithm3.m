@@ -313,8 +313,6 @@ if sum(sum(~isnan(R.(objective))))>=4
     
     MinNC = CutVariations{minD.I_a,minD.I_b};
     
-    
-    
     switch objective
         case 'Perimeter'
             % The transformation matrix for the plane variation with minimum Perimeter
