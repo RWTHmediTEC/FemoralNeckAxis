@@ -105,9 +105,8 @@ for I_a = 1:RangeLength_a
         % Create NoP Neck Contour Profiles (NC.P)
         tempContour = IntersectMeshPlaneParfor(Bone, NC.PlaneOrigins, PlaneNormal);
         for c=1:NoP
-            % If there is more than one closed contour after the cut, use 
-            % the longest one
-            [~, IobC] = max(cellfun(@length, tempContour{c}));
+            % If there is more than one closed contour after the cut, use the longest one
+            [~, IobC] = max(cellfun(@(x) sum(sqrt(sum(diff(x').^2,2))), tempContour{c}));
             NC.P(c).xyz = tempContour{c}{IobC}';
             % Close contour: Copy start value to the end, if needed
             if ~isequal(NC.P(c).xyz(1,:),NC.P(c).xyz(end,:))
