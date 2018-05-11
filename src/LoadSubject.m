@@ -46,9 +46,16 @@ GD.Subject.TFM = ROT*TRANS;
 
 GD.Subject.ViewVector = transformVector3d(GD.Subject.ViewVector, GD.Subject.TFM);
 
+switch GD.Subject.Side
+    case 'R'
+        Side = 'Right';
+    case 'L'
+        Side = 'Left';
+end
+
 if GD.Visualization == 1
     %% Configure subplots
-    set(GD.Figure.Handle, 'Name', [GD.Subject.Side ' femur of subject: ' GD.Subject.Name]);
+    set(GD.Figure.Handle, 'Name', [Side ' femur of subject: ' GD.Subject.Name]);
     % Clear right subplot
     rSP = GD.Figure.RightSpHandle;
     cla(rSP, 'reset');

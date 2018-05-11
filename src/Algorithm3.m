@@ -268,7 +268,8 @@ if sum(sum(~isnan(R.(objective))))>=4
         % A representative plot of the dispersion of focus locations
         % as a function of alpha (a) and beta (b).
         if ~ishandle(GD.Results.AxHandle)
-            figH_Res = figure('Name', GD.Subject.Name, 'Color', 'w');
+            figH_Res = figure('Name', ['Iteration results of subject: ' ...
+                GD.Subject.Name], 'Color', 'w', 'NumberTitle','off');
             axH_Res = axes(figH_Res);
             axis(axH_Res, 'equal', 'tight'); view(axH_Res,3);
             xlabel(axH_Res,'\alpha');
