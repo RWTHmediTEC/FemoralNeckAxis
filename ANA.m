@@ -47,8 +47,8 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 % AUTHOR: Maximilian C. M. Fischer
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
 % VERSION: 1.0.0
-% DATE: 2017-12-19
-% LICENSE: CC BY-SA 4.0
+% DATE: 2018-05-25
+% LICENSE: Modified BSD License (BSD license with non-military-use clause)
 
 % Validate inputs
 [Subject, PlaneVariationRange, StepSize, GD.Visualization, GD.Verbose] = ...
