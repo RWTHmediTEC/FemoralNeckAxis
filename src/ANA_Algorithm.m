@@ -1,4 +1,4 @@
-function GD = Algorithm3(GD)
+function GD = ANA_Algorithm(GD)
 %ALGORITHM3
 %    - An optimization algorithm for establishing a anatomical neck axis (ANA)
 %
@@ -14,8 +14,6 @@ function GD = Algorithm3(GD)
 %   AUTHOR: MCMF
 %
 
-objective = 'Perimeter';
-
 visu = GD.Visualization;
 if visu == 1
     % Figure & subplot handles
@@ -29,21 +27,22 @@ if visu == 1
 end
 
 %% Settings
-% Algorithm 3 - Part 1
 % The angles are varied in StepSize° increments within following range:
-PVR = GD.Algorithm3.PlaneVariationRange;
-StepSize = GD.Algorithm3.StepSize;
+PVR = GD.ANA_Algorithm.PlaneVariationRange;
+StepSize = GD.ANA_Algorithm.StepSize;
 
 % Ranges
 Range_a = -PVR:StepSize:PVR;
 Range_b = -PVR:StepSize:PVR;
 
 % Plot Plane Variation
-PlotPlaneVariation = GD.Algorithm3.PlaneVariaton;
+PlotPlaneVariation = GD.ANA_Algorithm.PlaneVariaton;
 
-% Algorithm 3 - Part 2
 % Plot Ellipses & Foci for each plane variation into the GUI figure
-EllipsePlot = GD.Algorithm3.EllipsePlot;
+EllipsePlot = GD.ANA_Algorithm.EllipsePlot;
+
+% Objective of the iteration process
+Objective = GD.ANA_Algorithm.Objective;
 
 %% START OF THE FRAMEWORK -------------------------------------------------
 % Algorithm 3 - Part 1
@@ -65,8 +64,8 @@ RangeLength_a = length(Range_a);
 RangeLength_b = length(Range_b);
 
 % Variable to save the results
-R.Dispersion = nan(RangeLength_a,RangeLength_b);
-R.Perimeter  = nan(RangeLength_a,RangeLength_b);
+R.dispersion = nan(RangeLength_a,RangeLength_b);
+R.perimeter  = nan(RangeLength_a,RangeLength_b);
 
 % Cell array to save the results of each plane variation
 CutVariations = cell(RangeLength_a,RangeLength_b);
@@ -136,10 +135,10 @@ for I_a = 1:RangeLength_a
             NC.P(c).length=polygonLength(NC.P(c).xyz(:,1:2));
         end
         
-        switch objective
-            case 'Perimeter'
+        switch Objective
+            case 'perimeter'
                 % Calculate the minimum perimeter of the cuts
-                R.Perimeter(I_a,I_b) = min([NC.P.length]);
+                R.perimeter(I_a,I_b) = min([NC.P.length]);
                 if visu == 1
                     %% Visualization during iteration
                     % RIGHT subplot: Plot the ellipses in 2D in the XY-plane
@@ -175,7 +174,7 @@ for I_a = 1:RangeLength_a
                     end
                     drawnow
                 end
-            case 'Dispersion'
+            case 'dispersion'
                 %% Algorithm 2
                 % A least-squares fitting algorithm for extracting geometric measures
                 Contours=cell(NoP,1);
@@ -204,8 +203,8 @@ for I_a = 1:RangeLength_a
                     NC.P(c).Ell.pf = Foci2D(1,:);
                     Center2D(c,:) = NC.P(c).Ell.z;
                 end
-                % Calculate the Dispersion as Eccentricity Measure
-                R.Dispersion(I_a,I_b) = CalculateDispersion(Center2D);
+                % Calculate the dispersion as Eccentricity Measure
+                R.dispersion(I_a,I_b) = CalculateDispersion(Center2D);
                 
                 if visu == 1
                     %% Visualization during iteration
@@ -233,7 +232,7 @@ for I_a = 1:RangeLength_a
                     % Plot contour-parts & ellipses
                     if EllipsePlot == 1
                         for c=1:NoP
-                            VisualizeContEll3D(lSP, NC.P(c), NC.PRM, 'm');
+                            ANA_VisualizeContEll3D(lSP, NC.P(c), NC.PRM, 'm');
                         end
                     end
                     drawnow
@@ -262,9 +261,9 @@ if GD.Verbose == 1
 end
 
 %% Results
-if sum(sum(~isnan(R.(objective))))>=4
+if sum(sum(~isnan(R.(Objective))))>=4
     if visu == 1
-        %% Dispersion plot
+        %% dispersion plot
         % A representative plot of the dispersion of focus locations
         % as a function of alpha (a) and beta (b).
         if ~ishandle(GD.Results.AxHandle)
@@ -274,11 +273,11 @@ if sum(sum(~isnan(R.(objective))))>=4
             axis(axH_Res, 'equal', 'tight'); view(axH_Res,3);
             xlabel(axH_Res,'\alpha');
             ylabel(axH_Res,'\beta');
-            zlabel(axH_Res, [objective ' [mm]'])
-            switch objective
-                case 'Dispersion'
+            zlabel(axH_Res, [Objective ' [mm]'])
+            switch Objective
+                case 'dispersion'
                     title(axH_Res, 'Dispersion of the ellipse centers as function of \alpha & \beta')
-                case 'Perimeter'
+                case 'perimeter'
                     title(axH_Res, 'Perimeter of the contours as function of \alpha & \beta')
             end
             GD.Results.AxHandle = axH_Res;
@@ -287,15 +286,15 @@ if sum(sum(~isnan(R.(objective))))>=4
         [Surf2.X, Surf2.Y] = meshgrid(Range_a, Range_b);
         Surf2.X = Surf2.X + GD.Results.OldDMin(1);
         Surf2.Y = Surf2.Y + GD.Results.OldDMin(2);
-        surf(GD.Results.AxHandle, Surf2.X', Surf2.Y', R.(objective))
+        surf(GD.Results.AxHandle, Surf2.X', Surf2.Y', R.(Objective))
     end
        
-    % Searching the cutting plane with minimum Dispersion
-    [minD.Value, minDIdx] = min(R.(objective)(:));
-    [minD.I_a, minD.I_b] = ind2sub(size(R.(objective)),minDIdx);
+    % Searching the cutting plane with minimum dispersion
+    [minD.Value, minDIdx] = min(R.(Objective)(:));
+    [minD.I_a, minD.I_b] = ind2sub(size(R.(Objective)),minDIdx);
     minD.a = Range_a(minD.I_a); minD.b = Range_b(minD.I_b);
     if GD.Verbose == 1
-        disp([newline ' Minimum ' objective ': ' num2str(minD.Value, '%1.2f') ' mm for ' ...
+        disp([newline ' Minimum ' Objective ': ' num2str(minD.Value, '%1.2f') ' mm for ' ...
             char(945) ' = ' num2str(minD.a) '° & ' ...
             char(946) ' = ' num2str(minD.b) '°.' newline])
     end
@@ -313,9 +312,9 @@ if sum(sum(~isnan(R.(objective))))>=4
     
     MinNC = CutVariations{minD.I_a,minD.I_b};
     
-    switch objective
-        case 'Perimeter'
-            % The transformation matrix for the plane variation with minimum Perimeter
+    switch Objective
+        case 'perimeter'
+            % The transformation matrix for the plane variation with minimum perimeter
             GD.Results.PlaneRotMat = MinNC.PRM'; % in this case TFM' == inv(TFM)
             [~, minPlaneIdx] = min([MinNC.P.length]);
             PeriCen2D = polygonCentroid(unique(MinNC.P(minPlaneIdx).xyz(:,1:2),'rows','stable'));
@@ -325,11 +324,11 @@ if sum(sum(~isnan(R.(objective))))>=4
             PlaneNormal = transformVector3d([0 0 1],MinNC.PRM);
             GD.Results.CenterLine = [PeriCen3D, PlaneNormal];
             GD.Results.CenterLineIdx = lineToVertexIndices(GD.Results.CenterLine, Bone);
-        case 'Dispersion'
-            % The rotation matrix for the plane variation with minimum Dispersion
+        case 'dispersion'
+            % The rotation matrix for the plane variation with minimum dispersion
             GD.Results.PlaneRotMat = MinNC.PRM'; % in this case TFM' == inv(TFM)
             
-            % Calculate centers in 3D for minimum Dispersion
+            % Calculate centers in 3D for minimum dispersion
             EllpCen3D = nan(NoP,3);
             for c=1:NoP
                 % Save the ellipse center for the Line fit
@@ -342,7 +341,7 @@ if sum(sum(~isnan(R.(objective))))>=4
             GD.Results.CenterLineIdx = lineToVertexIndices(GD.Results.CenterLine, Bone);
             
             % Display info about the ellipses in the command window
-            EllResults = CalcAndPrintEllipseResults(MinNC, NoP, GD.Verbose);
+            EllResults = ANA_CalcAndPrintEllipseResults(MinNC, NoP, GD.Verbose);
             GD.Results.Ell.a = EllResults(1,:);
             GD.Results.Ell.b = EllResults(2,:);
     end
@@ -350,15 +349,15 @@ if sum(sum(~isnan(R.(objective))))>=4
     %% Visualization of Results
     if visu == 1
         % Results in the main figure
-        % Plot the cutting plane with minimum Dispersion (Left subplot)
+        % Plot the cutting plane with minimum dispersion (Left subplot)
         ClearPlot(lSP, {'Patch','Scatter','Line'})
         PlaneNormal = transformVector3d([0 0 1],MinNC.PRM);
         drawPlatform(lSP, createPlane([0 0 0], PlaneNormal),100,...
             'FaceColor','w','FaceAlpha', 0.5);
         
-        switch objective
-            case 'Perimeter'
-                % Plot the contours in 2D (Right subplot) for minimum Perimeter
+        switch Objective
+            case 'perimeter'
+                % Plot the contours in 2D (Right subplot) for minimum perimeter
                 cla(rSP);
                 title(rSP, ['Min. perimeter of the contours in red: ' num2str(minD.Value) ' mm'])
                 hold(rSP,'on')
@@ -383,10 +382,10 @@ if sum(sum(~isnan(R.(objective))))>=4
                 scatter3(lSP, PeriCen3D(1),PeriCen3D(2),PeriCen3D(3),'r','filled', 'tag', 'SPN')
                 % Plot contour normal of the minimum perimeter
                 drawLine3d(lSP, GD.Results.CenterLine, 'color','r', 'tag','SPN');
-            case 'Dispersion'
-                % Plot the ellipses in 2D (Right subplot) for minimum Dispersion
+            case 'dispersion'
+                % Plot the ellipses in 2D (Right subplot) for minimum dispersion
                 cla(rSP);
-                title(rSP, ['Minimum Dispersion of the centers: ' num2str(minD.Value) ' mm'])
+                title(rSP, ['Minimum dispersion of the centers: ' num2str(minD.Value) ' mm'])
                 hold(rSP,'on')
                 % Plot the ellipses in 2D
                 for c=1:NoP
@@ -395,17 +394,17 @@ if sum(sum(~isnan(R.(objective))))>=4
                 hold(rSP,'off')
                 
                 % Delete old 3D ellipses & contours, if exist
-                title(lSP, 'Line fit through the centers for minimum Dispersion')
+                title(lSP, 'Line fit through the centers for minimum dispersion')
                 hold(lSP,'on')
-                % Plot contours, ellipses & foci in 3D for minimum Dispersion
+                % Plot contours, ellipses & foci in 3D for minimum dispersion
                 for c=1:NoP
-                    VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, 'm');
+                    ANA_VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, 'm');
                 end
                 
-                % Plot centers in 3D for minimum Dispersion
+                % Plot centers in 3D for minimum dispersion
                 scatter3(lSP, EllpCen3D(:,1),EllpCen3D(:,2),EllpCen3D(:,3),'b','filled', 'tag', 'CEA')
                 
-                % Plot axis through the centers for minimum Dispersion
+                % Plot axis through the centers for minimum dispersion
                 drawLine3d(lSP, GD.Results.CenterLine, 'color','b', 'tag','CEA');
         end
         drawnow

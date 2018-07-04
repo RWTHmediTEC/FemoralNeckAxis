@@ -17,7 +17,7 @@ if isfield(GD.Subject,'PatchHandle')
     end
     GD.Subject.TFM = TFM*GD.Subject.TFM;
     
-    GD = VisualizeSubjectBone(GD);
+    GD = ANA_VisualizeSubjectBone(GD);
     
 else
     uiwait(errordlg('Load a bone!','modal'));

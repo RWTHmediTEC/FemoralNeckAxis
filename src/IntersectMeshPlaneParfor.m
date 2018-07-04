@@ -16,14 +16,11 @@ if size(PlaneNormals,1)==1
     PlaneNormals = repmat(PlaneNormals, size(PlaneOrigins,1),1);
 end
 
+Contours = cell(size(PlaneOrigins,1),1);
 parfor p=1:size(PlaneOrigins,1)
     % To speed things up, use only the faces in the cutting plane as input 
     % for intersectPlaneSurf
-    % Logical index to the vertices below the plane
-    VBPl_LI = isBelowPlane(Mesh.vertices, createPlane(PlaneOrigins(p,:), PlaneNormals(p,:)));
-    % Logical index to three vertices of each face
-    FBP_LI = VBPl_LI(Mesh.faces);
-    % Faces in the plane, 1 or 2 vertices == 0
-    FacesInPlane = CutFacesOffMesh(Mesh, (sum(FBP_LI, 2) > 0 & sum(FBP_LI, 2) < 3) );
-    Contours{p} = intersectPlaneSurf(FacesInPlane, PlaneOrigins(p,:), PlaneNormals(p,:));
-end
+    Plane = createPlane(PlaneOrigins(p,:), PlaneNormals(p,:));
+    MeshInPlane = cutMeshByPlane(Mesh, Plane, 'part','in');
+    Contours{p} = intersectPlaneSurf(MeshInPlane, PlaneOrigins(p,:), PlaneNormals(p,:));
+end; clear p

@@ -30,6 +30,10 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %                  4° are valid. E.g. with a PlaneVariationRange of 4° it
 %                  results in a search field of:
 %                  ((4° x 2 / 2°) + 1)² = 25 plane variations
+%     'Objective' - Char: The objective of the iteration process:
+%                         'perimeter': min. perimiter of the neck (default)
+%                         'dispersion': min. dispersion of centers of 
+%                                     ellipses fitted to countours of neck.
 %     'Visualization' - Logical: Figure output. Default is true.
 %     'Verbose' - Logical: Command window output. Default is true.
 %
@@ -39,10 +43,11 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %     ANATFM - Double [4x4]: Transformation of the bone into the neck axis CS
 %
 % EXAMPLE:
-%     Run the file 'ANA_Example.m'
+%     Run the file 'ANA_Example.m' or 'ANA_GUI.m'.
 %
 % TODO/IDEAS:
-%   - Parse variable 'Objective' in Algorithm3 and NoCP
+%   - Parse variable NoCP
+%   - Add dropdown for GD.ANA_Algorithm.Objective to ANA_GUI.m
 %
 % AUTHOR: Maximilian C. M. Fischer
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
@@ -51,7 +56,7 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 % LICENSE: Modified BSD License (BSD license with non-military-use clause)
 
 % Validate inputs
-[Subject, PlaneVariationRange, StepSize, GD.Visualization, GD.Verbose] = ...
+[Subject, PlaneVariationRange, StepSize, GD.ANA_Algorithm.Objective, GD.Visualization, GD.Verbose] = ...
     validateAndParseOptInputs(vertices, faces, side, varargin{:});
 
 % USP path
@@ -106,24 +111,24 @@ GD.Subject.NeckAxisIdx = neckAxisIdx;
 GD.Subject.ShaftAxisIdx = shaftAxisIdx;
 GD.Subject.NeckOrthogonalIdx = neckOrthogonalIdx;
 
-GD = LoadSubject('no handle', GD);
+GD = ANA_LoadSubject('no handle', GD);
 
 %% Settings for the framework
 % Iteration settings
-GD.Algorithm3.PlaneVariationRange = PlaneVariationRange;
-GD.Algorithm3.StepSize = StepSize;
+GD.ANA_Algorithm.PlaneVariationRange = PlaneVariationRange;
+GD.ANA_Algorithm.StepSize = StepSize;
 
 % Visualization settings
 if GD.Visualization == 1
-    GD.Algorithm3.PlaneVariaton = 1;
-    GD.Algorithm3.EllipsePlot = 1;
+    GD.ANA_Algorithm.PlaneVariaton = 1;
+    GD.ANA_Algorithm.EllipsePlot = 1;
 elseif GD.Visualization == 0
-    GD.Algorithm3.PlaneVariaton = 0;
-    GD.Algorithm3.EllipsePlot = 0;
+    GD.ANA_Algorithm.PlaneVariaton = 0;
+    GD.ANA_Algorithm.EllipsePlot = 0;
 end
 
 % Start rough/fine iteration process
-GD = RoughFineIteration('no handle', GD);
+GD = ANA_RoughFineIteration('no handle', GD);
 
 %% Results
 ANATFM = GD.Subject.TFM;
@@ -135,7 +140,7 @@ end
 %==========================================================================
 % Parameter validation
 %==========================================================================
-function [Subject, PlaneVariationRange, StepSize, Visualization, Verbose] = ...
+function [Subject, PlaneVariationRange, StepSize, Objective, Visualization, Verbose] = ...
     validateAndParseOptInputs(vertices, faces, side, varargin)
 
 validateattributes(vertices, {'numeric'},{'ncols', 3});
@@ -148,6 +153,7 @@ defaults = struct(...
     'Subject', 'unnamed', ...
     'PlaneVariationRange', 4, ...
     'StepSize', 2, ...
+    'Objective', 'perimeter',...
     'Visualization', true, ...
     'Verbose', true);
 
@@ -160,6 +166,8 @@ parser.addParameter('PlaneVariationRange', defaults.PlaneVariationRange, ...
     @(x)validateattributes(x,{'numeric'}, {'integer', 'nonempty', 'numel',1, '>=',1, '<=',16}));
 parser.addParameter('StepSize', defaults.StepSize, ...
     @(x)validateattributes(x,{'numeric'}, {'integer', 'nonempty', 'numel',1, '>=',1, '<=',4}));
+parser.addParameter('Objective', defaults.Objective, ...
+    @(x)any(validatestring(x, {'perimeter','dispersion'})));
 parser.addParameter('Visualization', defaults.Visualization, ...
     @(x)validateattributes(x,{'logical'}, {'scalar','nonempty'}));
 parser.addParameter('Verbose', defaults.Verbose, ...
@@ -170,6 +178,7 @@ parser.parse(varargin{:});
 Subject             = parser.Results.Subject;
 PlaneVariationRange = parser.Results.PlaneVariationRange;
 StepSize            = parser.Results.StepSize;
+Objective           = parser.Results.Objective;
 Visualization       = parser.Results.Visualization;
 Verbose             = parser.Results.Verbose;
 

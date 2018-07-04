@@ -1,4 +1,4 @@
-function GD = VisualizeSubjectBone(GD)
+function GD = ANA_VisualizeSubjectBone(GD)
 
 % figure(GD.Figure.Handle);
 lSP = GD.Figure.LeftSpHandle;
