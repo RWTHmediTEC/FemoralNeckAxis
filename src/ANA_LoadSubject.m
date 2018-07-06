@@ -11,7 +11,7 @@ if ishandle(hObject)
     % Store subject data
     GD.Subject.Mesh.vertices = Subject.mesh.vertices;
     GD.Subject.Mesh.faces = Subject.mesh.faces;
-    GD.Subject.Side = Subject.side;
+    GD.Subject.Side = upper(Subject.side(1));
     GD.Subject.NeckAxisIdx = Subject.LM.NeckAxis;
     GD.Subject.ShaftAxisIdx = Subject.LM.ShaftAxis;
     GD.Subject.NeckOrthogonalIdx = Subject.LM.NeckOrthogonal;
@@ -46,15 +46,9 @@ GD.Subject.TFM = ROT*TRANS;
 
 GD.Subject.ViewVector = transformVector3d(GD.Subject.ViewVector, GD.Subject.TFM);
 
-switch GD.Subject.Side
-    case 'R'
-        Side = 'Right';
-    case 'L'
-        Side = 'Left';
-end
-
 if GD.Visualization == 1
     %% Configure subplots
+    switch GD.Subject.Side; case 'R'; Side = 'Right'; case 'L'; Side = 'Left'; end
     set(GD.Figure.Handle, 'Name', [Side ' femur of subject: ' GD.Subject.Name]);
     % Clear right subplot
     rSP = GD.Figure.RightSpHandle;
