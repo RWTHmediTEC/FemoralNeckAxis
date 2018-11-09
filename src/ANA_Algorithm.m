@@ -70,7 +70,7 @@ R.perimeter  = nan(RangeLength_a,RangeLength_b);
 % Cell array to save the results of each plane variation
 CutVariations = cell(RangeLength_a,RangeLength_b);
 
-if GD.Verbose == 1
+if GD.Verbose
     % Start updated command window information
     dispstat('','init');
     dispstat('Initializing the iteration process...','keepthis','timestamp');
@@ -183,7 +183,7 @@ for I_a = 1:RangeLength_a
                     Contours{c} = NC.P(c).xyz(:,1:2)';
                 end
                 % Parametric least-squares fitting and analysis of cross-sectional profiles
-                tempEll2D = FitEllipseParfor(Contours);
+                tempEll2D = FitEllipseParfor(Contours, GD.Verbose);
                 for c=1:NoP
                     NC.P(c).Ell.z = tempEll2D(1:2,c)';
                     NC.P(c).Ell.a = tempEll2D(3,c);
@@ -245,7 +245,7 @@ for I_a = 1:RangeLength_a
         % Count the variation
         PV_Counter=PV_Counter+1;
         
-        if GD.Verbose == 1
+        if GD.Verbose
             % Variation info in command window
             dispstat(['Plane variation ' num2str(PV_Counter) ' of ' ...
                 num2str(RangeLength_a*RangeLength_b) '. '...
@@ -255,7 +255,7 @@ for I_a = 1:RangeLength_a
     end
 end
 
-if GD.Verbose == 1
+if GD.Verbose
     % Stop updated command window information
     dispstat('','keepprev');
 end
@@ -293,7 +293,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
     [minD.Value, minDIdx] = min(R.(Objective)(:));
     [minD.I_a, minD.I_b] = ind2sub(size(R.(Objective)),minDIdx);
     minD.a = Range_a(minD.I_a); minD.b = Range_b(minD.I_b);
-    if GD.Verbose == 1
+    if GD.Verbose
         disp([newline ' Minimum ' Objective ': ' num2str(minD.Value, '%1.2f') ' mm for ' ...
             char(945) ' = ' num2str(minD.a) '° & ' ...
             char(946) ' = ' num2str(minD.b) '°.' newline])
