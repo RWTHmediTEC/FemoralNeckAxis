@@ -3,8 +3,6 @@ if ishandle(hObject); GD = guidata(hObject); end
 
 % Variable to save the rotation values during the rough iterations
 GD.Results.OldDMin(1) = 0; GD.Results.OldDMin(2) = 0;
-GD.Results.AxHandle = nan;
-
 
 %% Rough Iteration
 if GD.Verbose == 1

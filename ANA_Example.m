@@ -1,6 +1,4 @@
 clearvars; close all; opengl hardware
-% [List.f, List.p] = matlab.codetools.requiredFilesAndProducts([mfilename '.m']);
-% List.f = List.f'; List.p = List.p';
 
 %% Select subject
 Idx = 1;
@@ -53,3 +51,7 @@ drawLine3d(ANAxis, 'b');
 
 % Light
 light1 = light; light('Position', -1*(get(light1,'Position')));
+
+
+% [List.f, List.p] = matlab.codetools.requiredFilesAndProducts([mfilename '.m']);
+% List.f = List.f'; List.p = List.p';

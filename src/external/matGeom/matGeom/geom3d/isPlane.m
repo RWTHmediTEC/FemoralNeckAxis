@@ -1,5 +1,5 @@
 function d = isPlane(plane)
-%ISPLANE Check if input is a plane
+%ISPLANE Check if input is a plane.
 %
 %   B = isPlane(PLANE) where PLANE should be a plane or multiple planes
 %
@@ -15,7 +15,7 @@ function d = isPlane(plane)
 %   createPlane3d
 %
 % ------
-% Author: oqilipo, David Legland
+% Author: oqilipo
 % Created: 2017-07-09
 % Copyright 2017
 
@@ -30,4 +30,6 @@ a = ~any(isnan(plane),2);
 b = ~any(isinf(plane),2);
 c = ~isParallel3d(plane(:,4:6), plane(:,7:9));
 
-d=a & b & c;
+d = a & b & c;
+
+end

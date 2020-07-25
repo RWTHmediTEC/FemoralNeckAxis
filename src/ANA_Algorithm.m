@@ -263,25 +263,8 @@ end
 %% Results
 if sum(sum(~isnan(R.(Objective))))>=4
     if visu == 1
-        %% dispersion plot
-        % A representative plot of the dispersion of focus locations
-        % as a function of alpha (a) and beta (b).
-        if ~ishandle(GD.Results.AxHandle)
-            figH_Res = figure('Name', ['Iteration results of subject: ' ...
-                GD.Subject.Name], 'Color', 'w', 'NumberTitle','off');
-            axH_Res = axes(figH_Res);
-            axis(axH_Res, 'equal', 'tight'); view(axH_Res,3);
-            xlabel(axH_Res,'\alpha');
-            ylabel(axH_Res,'\beta');
-            zlabel(axH_Res, [Objective ' [mm]'])
-            switch Objective
-                case 'dispersion'
-                    title(axH_Res, 'Dispersion of the ellipse centers as function of \alpha & \beta')
-                case 'perimeter'
-                    title(axH_Res, 'Perimeter of the contours as function of \alpha & \beta')
-            end
-            GD.Results.AxHandle = axH_Res;
-        end
+        % dispersion plot
+        GD.Results.AxHandle.Visible = 'on';
         hold(GD.Results.AxHandle,'on')
         [Surf2.X, Surf2.Y] = meshgrid(Range_a, Range_b);
         Surf2.X = Surf2.X + GD.Results.OldDMin(1);

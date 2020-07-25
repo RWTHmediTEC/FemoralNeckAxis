@@ -61,8 +61,8 @@ if GD.Visualization == 1
     % Left subject subplot and properties
     lSP = GD.Figure.LeftSpHandle;
     cla(lSP,'reset');
-    axis(lSP,'on');
-    xlabel(lSP,'X [mm]'); ylabel(lSP,'Y [mm]'); zlabel(lSP,'Z [mm]');
+    axis(lSP,'off');
+%     xlabel(lSP,'X [mm]'); ylabel(lSP,'Y [mm]'); zlabel(lSP,'Z [mm]');
     set(lSP,'Color',GD.Figure.Color);
     light1 = light(lSP); light(lSP, 'Position', -1*(get(light1,'Position')));
     cameratoolbar('SetCoordSys','none')

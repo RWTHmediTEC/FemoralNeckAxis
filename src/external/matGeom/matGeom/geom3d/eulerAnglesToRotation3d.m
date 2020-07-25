@@ -1,5 +1,5 @@
 function mat = eulerAnglesToRotation3d(phi, theta, psi, varargin)
-%EULERANGLESTOROTATION3D Convert 3D Euler angles to 3D rotation matrix
+%EULERANGLESTOROTATION3D Convert 3D Euler angles to 3D rotation matrix.
 %
 %   MAT = eulerAnglesToRotation3d(PHI, THETA, PSI)
 %   Creates a rotation matrix from the 3 euler angles PHI THETA and PSI,
@@ -14,7 +14,7 @@ function mat = eulerAnglesToRotation3d(phi, theta, psi, varargin)
 %   PSI:    rotation angle around X-axis, in degrees, corresponding to the
 %       'Roll'. PSI is between -180 and +180.
 %   These angles correspond to the "Yaw-Pitch-Roll" convention, also known
-%   as "Tait–Bryan angles".
+%   as "Tait-Bryan angles".
 %
 %   The resulting rotation is equivalent to a rotation around X-axis by an
 %   angle PSI, followed by a rotation around the Y-axis by an angle THETA,
@@ -26,8 +26,10 @@ function mat = eulerAnglesToRotation3d(phi, theta, psi, varargin)
 %   Concatenates all angles in a single 1-by-3 array.
 %   
 %   ... = eulerAnglesToRotation3d(ANGLES, CONVENTION)
-%   CONVENTION specifies the axis rotation sequence. 
-%   Supported conventions are: 'ZYX', 'ZYZ'. Default is 'ZYX'.
+%   CONVENTION specifies the axis rotation sequence. Default is 'ZYX'.
+%   Supported conventions are: 
+%       'ZYX','ZXY','YXZ','YZX','XYZ','XZY'
+%       'ZYZ','ZXZ','YZY','YXY','XZX','XYX'
 %
 %   Example
 %   [n e f] = createCube;
@@ -52,19 +54,24 @@ function mat = eulerAnglesToRotation3d(phi, theta, psi, varargin)
 %   HISTORY
 %   2011-06-20 rename and use degrees
 
-p = inputParser;
-validStrings = {'ZYX','ZYZ'};
-addOptional(p,'convention','ZYX',@(x) any(validatestring(x,validStrings)));
-parse(p,varargin{:});
-convention=p.Results.convention;
-
 % Process input arguments
 if size(phi, 2) == 3
+    if nargin > 1
+        varargin{1} = theta;
+    end
     % manages arguments given as one array
     psi     = phi(:, 3);
     theta   = phi(:, 2);
     phi     = phi(:, 1);
 end
+
+p = inputParser;
+validStrings = {...
+    'ZYX','ZXY','YXZ','YZX','XYZ','XZY',...
+    'ZYZ','ZXZ','YZY','YXY','XZX','XYX'};
+addOptional(p,'convention','ZYX',@(x) any(validatestring(x,validStrings)));
+parse(p,varargin{:});
+convention=p.Results.convention;
 
 % create individual rotation matrices
 k = pi / 180;
@@ -74,10 +81,50 @@ switch convention
         rot1 = createRotationOx(psi * k);
         rot2 = createRotationOy(theta * k);
         rot3 = createRotationOz(phi * k);
+    case 'ZXY'
+        rot1 = createRotationOy(psi * k);
+        rot2 = createRotationOx(theta * k);
+        rot3 = createRotationOz(phi * k);
+    case 'YXZ'
+        rot1 = createRotationOz(psi * k);
+        rot2 = createRotationOx(theta * k);
+        rot3 = createRotationOy(phi * k);
+    case 'YZX'
+        rot1 = createRotationOx(psi * k);
+        rot2 = createRotationOz(theta * k);
+        rot3 = createRotationOy(phi * k);
+    case 'XYZ'
+        rot1 = createRotationOz(psi * k);
+        rot2 = createRotationOy(theta * k);
+        rot3 = createRotationOx(phi * k);
+    case 'XZY'
+        rot1 = createRotationOy(psi * k);
+        rot2 = createRotationOz(theta * k);
+        rot3 = createRotationOx(phi * k);
     case 'ZYZ'
         rot1 = createRotationOz(psi * k);
         rot2 = createRotationOy(theta * k);
         rot3 = createRotationOz(phi * k);
+    case 'ZXZ'
+        rot1 = createRotationOz(psi * k);
+        rot2 = createRotationOx(theta * k);
+        rot3 = createRotationOz(phi * k);
+    case 'YZY'
+        rot1 = createRotationOy(psi * k);
+        rot2 = createRotationOz(theta * k);
+        rot3 = createRotationOy(phi * k);
+    case 'YXY'
+        rot1 = createRotationOy(psi * k);
+        rot2 = createRotationOx(theta * k);
+        rot3 = createRotationOy(phi * k);
+    case 'XZX'
+        rot1 = createRotationOx(psi * k);
+        rot2 = createRotationOz(theta * k);
+        rot3 = createRotationOx(phi * k);
+    case 'XYX'
+        rot1 = createRotationOx(psi * k);
+        rot2 = createRotationOy(theta * k);
+        rot3 = createRotationOx(phi * k);
 end
 
 % concatenate matrices
