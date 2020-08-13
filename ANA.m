@@ -1,5 +1,4 @@
-function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
-    shaftAxisIdx, neckOrthogonalIdx, varargin)
+function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxis, shaftAxis, varargin)
 %ANA An optimization algorithm for establishing an anatomical neck axis (ANA)
 %
 % INPUT:
@@ -7,12 +6,10 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %     vertices - Double [Nx3]: A list of points of the femoral neck mesh
 %     faces - Integer [Mx3]: A list of triangle faces, indexing into the vertices
 %     side - Char: 'L' or 'R' femur
-%     neckAxisIdx - Integer [Mx2]: Vertex indices defining a default 
-%       initial neck axis
-%     shaftAxisIdx - Integer [Mx2]: Vertex indices defining a default 
-%       initial shaft axis
-%     neckOrthogonalIdx - Integer [Mx2]: Vertex indices defining a default 
-%       initial ortogonal to the neck axis in smallest the region of the neck
+%     neckAxis - Double [1x6]: Initial neck axis with the approximate
+%       center of the neck isthmus as origin
+%     shaftAxis - Double [1x6]: Initial shaft axis with the approximate
+%       middle of the shaft as origin
 %     
 %   - ADDITIONAL:
 %     'Subject' - Char: Identification of the subject. Default is 'anonymous'.
@@ -38,8 +35,7 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %     'Verbose' - Logical: Command window output. Default is true.
 %
 % OUTPUT:
-%     ANA - Double [1x6]: A line fitted through the centers of the ellipses
-%           with minimum dispersion.
+%     ANA - Double [1x6]: The optimized anatomical neck axis.
 %     ANATFM - Double [4x4]: Transformation of the bone into the neck axis CS
 %
 % EXAMPLE:
@@ -51,8 +47,8 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxisIdx, ...
 %
 % AUTHOR: Maximilian C. M. Fischer
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
-% VERSION: 1.0.0
-% DATE: 2018-05-25
+% VERSION: 2.0.0
+% DATE: 2020-08-13
 % LICENSE: Modified BSD License (BSD license with non-military-use clause)
 
 % Validate inputs
@@ -132,9 +128,8 @@ GD.Subject.Mesh.vertices = vertices;
 GD.Subject.Mesh.faces = faces;
 GD.Subject.Side = side; % [L]eft or [R]ight
 GD.Subject.Name = Subject; % Subject name
-GD.Subject.NeckAxisIdx = neckAxisIdx;
-GD.Subject.ShaftAxisIdx = shaftAxisIdx;
-GD.Subject.NeckOrthogonalIdx = neckOrthogonalIdx;
+GD.Subject.NeckAxis = normalizeLine3d(neckAxis);
+GD.Subject.ShaftAxis = normalizeLine3d(shaftAxis);
 
 GD = ANA_LoadSubject('no handle', GD);
 
@@ -171,7 +166,6 @@ function [Subject, PlaneVariationRange, StepSize, Objective, Visualization, Verb
 validateattributes(vertices, {'numeric'},{'ncols', 3});
 validateattributes(faces, {'numeric'},{'integer','nonnegative','nonempty','ncols', 3});
 validatestring(side, {'R','L'});
-% validateattributes(InitialRot, {'numeric'},{'>=', -180, '<=', 180,'size', [1 3]});
 
 % Parse the input P-V pairs
 defaults = struct(...

@@ -8,6 +8,7 @@ load('data\F','F')
 Subject=F(Idx);
 
 % Read subject surface data and store
+femur = F(Idx).mesh;
 Vertices = F(Idx).mesh.vertices;
 Faces = F(Idx).mesh.faces;
 Side = F(Idx).side;
@@ -17,10 +18,25 @@ NeckAxisIdx = F(Idx).LM.NeckAxis;
 ShaftAxisIdx = F(Idx).LM.ShaftAxis;
 NeckOrthogonalIdx = F(Idx).LM.NeckOrthogonal;
 
+% Create the neck axis from the vertex indices
+NeckAxis=createLine3d(...
+    femur.vertices(NeckAxisIdx(1),:),...
+    femur.vertices(NeckAxisIdx(2),:));
+% Create the shaft axis from the vertex indices
+ShaftAxis=createLine3d(...
+    femur.vertices(ShaftAxisIdx(1),:),...
+    femur.vertices(ShaftAxisIdx(2),:));
+% Create the neck orthogonal from the vertex indices
+NeckOrthogonal=createLine3d(...
+    femur.vertices(NeckOrthogonalIdx(1),:),...
+    femur.vertices(NeckOrthogonalIdx(2),:));
+% Neck axis starts at the intersection of neck axis and neck orthogonal
+[~, NeckAxis(1:3), ~] = distanceLines3d(NeckAxis, NeckOrthogonal);
+
 %% Select different options by commenting 
 % Default mode
-[ANAxis, ANATFM] = ANA(Vertices, Faces, Side, ...
-    NeckAxisIdx, ShaftAxisIdx, NeckOrthogonalIdx, 'Subject', num2str(Idx));
+[ANAxis, ANATFM] = ANA(femur.vertices, femur.faces, Side, ...
+    NeckAxis, ShaftAxis, 'Subject', num2str(Idx));
 % Silent mode
 % [ANAxis, ANATFM] = ANA(Vertices, Faces, Side, NeckAxisIdx, ShaftAxisIdx, ...
 %     NeckOrthogonalIdx, 'Subject', num2str(Idx), 'Visu', false, 'Verbose', false);

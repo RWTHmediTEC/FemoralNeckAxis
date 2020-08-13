@@ -12,32 +12,32 @@ if ishandle(hObject)
     GD.Subject.Mesh.vertices = Subject.mesh.vertices;
     GD.Subject.Mesh.faces = Subject.mesh.faces;
     GD.Subject.Side = upper(Subject.side(1));
-    GD.Subject.NeckAxisIdx = Subject.LM.NeckAxis;
-    GD.Subject.ShaftAxisIdx = Subject.LM.ShaftAxis;
-    GD.Subject.NeckOrthogonalIdx = Subject.LM.NeckOrthogonal;
+    GD.Subject.NeckAxis = Subject.LM.NeckAxis;
+    GD.Subject.ShaftAxis = Subject.LM.ShaftAxis;
 end
 
-% Create the neck axis from the vertex indices
-NeckAxis=createLine3d(...
-    GD.Subject.Mesh.vertices(GD.Subject.NeckAxisIdx(1),:),...
-    GD.Subject.Mesh.vertices(GD.Subject.NeckAxisIdx(2),:));
-NeckAxis(4:6)=normalizeVector3d(NeckAxis(4:6));
-% Create the shaft axis from the vertex indices
-ShaftAxis=createLine3d(...
-    GD.Subject.Mesh.vertices(GD.Subject.ShaftAxisIdx(1),:),...
-    GD.Subject.Mesh.vertices(GD.Subject.ShaftAxisIdx(2),:));
-ShaftAxis(4:6)=normalizeVector3d(ShaftAxis(4:6));
-% Create the neck orthogonal from the vertex indices
-NeckOrthogonal=createLine3d(...
-    GD.Subject.Mesh.vertices(GD.Subject.NeckOrthogonalIdx(1),:),...
-    GD.Subject.Mesh.vertices(GD.Subject.NeckOrthogonalIdx(2),:));
-NeckOrthogonal(4:6)=normalizeVector3d(NeckOrthogonal(4:6));
-% Neck axis starts at the intersection of neck axis and neck orthogonal
-[~, NeckAxis(1:3), ~] = distanceLines3d(NeckAxis, NeckOrthogonal);
+%% Check direction of neck and shaft axis
+% Neck axis should point in lateral direction
+[~, NeckShaftIts, ShaftNeckIts] = distanceLines3d(GD.Subject.NeckAxis, GD.Subject.ShaftAxis);
+if sign(GD.Subject.NeckAxis(4:6)) ~= sign(normalizeVector3d(NeckShaftIts(1:3)-GD.Subject.NeckAxis(1:3)))
+    GD.Subject.NeckAxis(4:6)=-GD.Subject.NeckAxis(4:6);
+end
+% Shaft axis should point in distal direction
+if sign(GD.Subject.ShaftAxis(4:6)) ~= sign(normalizeVector3d(GD.Subject.ShaftAxis(1:3)-ShaftNeckIts))
+    GD.Subject.ShaftAxis(4:6)=-GD.Subject.ShaftAxis(4:6);
+end
+% !!! Include sanity checks after transformation !!!
 
-GD.Subject.initalNeckAxis = NeckAxis;
-GD.Subject.ViewVector(1,:)=-ShaftAxis(4:6);
-GD.Subject.ViewVector(2,:)= NeckOrthogonal(4:6);
+GD.Subject.initalNeckAxis = normalizeLine3d(GD.Subject.NeckAxis);
+GD.Subject.ViewVector(1,:)= normalizeVector3d(GD.Subject.ShaftAxis(4:6));
+switch GD.Subject.Side
+    case 'R'
+        GD.Subject.ViewVector(2,:)= normalizeVector3d(...
+            crossProduct3d(GD.Subject.ViewVector(1,:),GD.Subject.initalNeckAxis(4:6)));
+    case 'L'
+        GD.Subject.ViewVector(2,:)= normalizeVector3d(...
+            crossProduct3d(GD.Subject.initalNeckAxis(4:6), GD.Subject.ViewVector(1,:)));
+end
 
 %% Create initial transformation
 TRANS = createTranslation3d(-GD.Subject.initalNeckAxis(1:3));
