@@ -1,4 +1,4 @@
-function M = ANA_CalcAndPrintEllipseResults(C, NoPpC, Print)
+function M = FNA_CalcAndPrintEllipseResults(C, NoPpC, Print)
 
 a = [];
 b = [];

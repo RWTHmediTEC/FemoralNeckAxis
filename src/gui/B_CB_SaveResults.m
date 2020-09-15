@@ -2,9 +2,9 @@ function GD = B_CB_SaveResults(hObject, GD)
 if ishandle(hObject); GD = guidata(hObject); end
 
 if isfield(GD.Results, 'PlaneRotMat')
-    ANATFM = GD.Subject.TFM;
-    ANAxis = GD.Results.ANA;
-    save('ANA_Results.mat', 'ANATFM', 'ANAxis')
+    FNAxis = GD.Results.FNA;
+    FNA_TFM = GD.Subject.TFM;
+    save('FNA_Results.mat', 'FNAxis', 'FNA_TFM')
     disp('Results saved.')
 else
     uiwait(errordlg('There are no results to save'));

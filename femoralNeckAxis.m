@@ -4,12 +4,12 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 % INPUT:
 %   - REQUIRED:
 %     femur - struct: A clean mesh of the distal femur defined by the 
-%           fields vertices (double [Nx3]) and faces (integer [Mx3]) 
+%       fields vertices (double [Nx3]) and faces (integer [Mx3]) 
 %     side - Char: 'L' or 'R' femur
-%     neckAxis - Double [1x6]: Initial neck axis with the approximate
-%       center of the neck isthmus as origin
-%     shaftAxis - Double [1x6]: Initial shaft axis with the approximate
-%       middle of the shaft as origin
+%     neckAxis - Double [1x6]: Initial femoral neck axis with the 
+%       approximate center of the neck isthmus as origin
+%     shaftAxis - Double [1x6]: Initial femoral shaft axis with the 
+%       approximate middle of the shaft as origin
 %     
 %   - ADDITIONAL:
 %     'Subject' - Char: Identification of the subject. Default is 'anonymous'.
@@ -35,7 +35,7 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 %     'Verbose' - Logical: Command window output. Default is true.
 %
 % OUTPUT:
-%     FNA - Double [1x6]: The optimized anatomical neck axis.
+%     FNA - Double [1x6]: The optimized femoral neck axis.
 %     FNA_TFM - Double [4x4]: Transformation of the bone into the neck axis CS
 %
 % EXAMPLE:
@@ -43,21 +43,22 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 %
 % TODO/IDEAS:
 %   - Parse variable NoCP
-%   - Add dropdown for GD.ANA_Algorithm.Objective to femoralNeckAxis_GUI.m
+%   - Complete header sections
 %
 % AUTHOR: Maximilian C. M. Fischer
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
 % VERSION: 2.0.0
 % DATE: 2020-09-15
-% COPYRIGHT (C) 2016 - 2020 Maximilian C. M. Fischer
+% COPYRIGHT (C) 2017 - 2020 Maximilian C. M. Fischer
 % LICENSE: EUPL v1.2
 % 
 
 % Validate inputs
-[Subject, PlaneVariationRange, StepSize, GD.ANA_Algorithm.Objective, GD.Visualization, GD.Verbose] = ...
+[Subject, PlaneVariationRange, StepSize, ...
+    GD.FNA_Algorithm.Objective, GD.Visualization, GD.Verbose] = ...
     validateAndParseOptInputs(femur, side, varargin{:});
 
-% USP path
+% FNA path
 GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
 
 % Add path for external functions
@@ -69,7 +70,7 @@ if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
     mex([mexPath '\IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
 end
 
-% Number of cutting planes per cuting box
+% Number of cutting planes
 GD.Cond.NoPpC = 15;
 
 if GD.Visualization == 1
@@ -115,8 +116,8 @@ if GD.Visualization == 1
         axis(IH, 'equal', 'tight'); view(IH,3);
         xlabel(IH,'\alpha [°]');
         ylabel(IH,'\beta [°]');
-        zlabel(IH, [GD.ANA_Algorithm.Objective ' [mm]'])
-        switch GD.ANA_Algorithm.Objective
+        zlabel(IH, [GD.FNA_Algorithm.Objective ' [mm]'])
+        switch GD.FNA_Algorithm.Objective
             case 'dispersion'
                 title(IH, 'Dispersion of the ellipse centers as function of \alpha & \beta')
             case 'perimeter'
@@ -132,28 +133,28 @@ GD.Subject.Name = Subject; % Subject name
 GD.Subject.NeckAxis = normalizeLine3d(neckAxis);
 GD.Subject.ShaftAxis = normalizeLine3d(shaftAxis);
 
-GD = ANA_LoadSubject('no handle', GD);
+GD = FNA_LoadSubject('no handle', GD);
 
 %% Settings for the framework
 % Iteration settings
-GD.ANA_Algorithm.PlaneVariationRange = PlaneVariationRange;
-GD.ANA_Algorithm.StepSize = StepSize;
+GD.FNA_Algorithm.PlaneVariationRange = PlaneVariationRange;
+GD.FNA_Algorithm.StepSize = StepSize;
 
 % Visualization settings
 if GD.Visualization == 1
-    GD.ANA_Algorithm.PlaneVariaton = 1;
-    GD.ANA_Algorithm.EllipsePlot = 1;
+    GD.FNA_Algorithm.PlaneVariaton = 1;
+    GD.FNA_Algorithm.EllipsePlot = 1;
 elseif GD.Visualization == 0
-    GD.ANA_Algorithm.PlaneVariaton = 0;
-    GD.ANA_Algorithm.EllipsePlot = 0;
+    GD.FNA_Algorithm.PlaneVariaton = 0;
+    GD.FNA_Algorithm.EllipsePlot = 0;
 end
 
 % Start rough/fine iteration process
-GD = ANA_RoughFineIteration('no handle', GD);
+GD = FNA_RoughFineIteration('no handle', GD);
 
 %% Results
 FNA_TFM = GD.Subject.TFM;
-FNA = GD.Results.ANA;
+FNA = GD.Results.FNA;
 
 end
 
@@ -166,7 +167,7 @@ function [Subject, PlaneVariationRange, StepSize, Objective, Visualization, Verb
 
 validateattributes(femur.vertices, {'numeric'},{'ncols', 3});
 validateattributes(femur.faces, {'numeric'},{'integer','nonnegative','nonempty','ncols', 3});
-validatestring(side, {'R','L'});
+validatestring(upper(side(1)), {'R','L'});
 
 % Parse the input P-V pairs
 defaults = struct(...

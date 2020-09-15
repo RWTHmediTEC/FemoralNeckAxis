@@ -1,7 +1,7 @@
 clearvars; close all; opengl hardware
 
 %% Select subject
-Idx = 1;
+Idx = 2;
 
 load('data\F','F')
 

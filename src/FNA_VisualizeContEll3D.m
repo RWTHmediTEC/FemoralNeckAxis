@@ -1,4 +1,4 @@
-function ANA_VisualizeContEll3D(H, P, RotTFM, EllColor)
+function FNA_VisualizeContEll3D(H, P, RotTFM, EllColor)
 
 %% Contour
 % % Plot contour-part in pseudo 3D in X-Y-Plane

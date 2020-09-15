@@ -1,4 +1,4 @@
-function GD = ANA_LoadSubject(hObject, GD)
+function GD = FNA_LoadSubject(hObject, GD)
 
 if ishandle(hObject)
     GD = guidata(hObject);
@@ -71,7 +71,7 @@ if GD.Visualization == 1
     cameratoolbar('SetCoordSys','none')
     
     %% Visualize Subject Bone with the Default Neck Plane (DNP)
-    GD = ANA_VisualizeSubjectBone(GD);
+    GD = FNA_VisualizeSubjectBone(GD);
     axis(lSP,'equal');
     
     % Plot a dot into the Point of Origin

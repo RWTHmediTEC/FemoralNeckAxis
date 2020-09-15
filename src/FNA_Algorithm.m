@@ -1,6 +1,6 @@
-function GD = ANA_Algorithm(GD)
-%ALGORITHM3
-%    - An optimization algorithm for establishing a anatomical neck axis (ANA)
+function GD = FNA_Algorithm(GD)
+%FNA_ALGORITHM
+%    - An optimization algorithm for establishing a femoral neck axis (FNA)
 %
 %   REFERENCE:
 %       none
@@ -11,8 +11,10 @@ function GD = ANA_Algorithm(GD)
 %   OUTPUT:
 %       TODO
 %
-%   AUTHOR: MCMF
-%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2017 - 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+% 
 
 visu = GD.Visualization;
 if visu == 1
@@ -28,25 +30,24 @@ end
 
 %% Settings
 % The angles are varied in StepSize° increments within following range:
-PVR = GD.ANA_Algorithm.PlaneVariationRange;
-StepSize = GD.ANA_Algorithm.StepSize;
+PVR = GD.FNA_Algorithm.PlaneVariationRange;
+StepSize = GD.FNA_Algorithm.StepSize;
 
 % Ranges
 Range_a = -PVR:StepSize:PVR;
 Range_b = -PVR:StepSize:PVR;
 
 % Plot Plane Variation
-PlotPlaneVariation = GD.ANA_Algorithm.PlaneVariaton;
+PlotPlaneVariation = GD.FNA_Algorithm.PlaneVariaton;
 
 % Plot Ellipses & Foci for each plane variation into the GUI figure
-EllipsePlot = GD.ANA_Algorithm.EllipsePlot;
+EllipsePlot = GD.FNA_Algorithm.EllipsePlot;
 
 % Objective of the iteration process
-Objective = GD.ANA_Algorithm.Objective;
+Objective = GD.FNA_Algorithm.Objective;
 
 %% START OF THE FRAMEWORK -------------------------------------------------
-% Algorithm 3 - Part 1
-% An optimization algorithm for establishing a anatomical neck axis (ANA)
+% An optimization algorithm for establishing a femoral neck axis (FNA)
 
 % Bone Surface
 Bone = transformPoint3d(GD.Subject.Mesh, GD.Subject.TFM);
@@ -191,9 +192,6 @@ for I_a = 1:RangeLength_a
                     NC.P(c).Ell.g = tempEll2D(5,c);
                 end
                 
-                %% Algorithm 3 - Part 2
-                % An optimization algorithm for establishing the anatomical neck axis
-                
                 % Calculate the ellipse foci (Foci2D) and the major (A) & minor (B) axis points (AB)
                 Center2D = nan(NoP,2);
                 for c=1:NoP
@@ -232,7 +230,7 @@ for I_a = 1:RangeLength_a
                     % Plot contour-parts & ellipses
                     if EllipsePlot == 1
                         for c=1:NoP
-                            ANA_VisualizeContEll3D(lSP, NC.P(c), NC.PRM, 'm');
+                            FNA_VisualizeContEll3D(lSP, NC.P(c), NC.PRM, 'm');
                         end
                     end
                     drawnow
@@ -324,7 +322,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
             GD.Results.CenterLineIdx = lineToVertexIndices(GD.Results.CenterLine, Bone);
             
             % Display info about the ellipses in the command window
-            EllResults = ANA_CalcAndPrintEllipseResults(MinNC, NoP, GD.Verbose);
+            EllResults = FNA_CalcAndPrintEllipseResults(MinNC, NoP, GD.Verbose);
             GD.Results.Ell.a = EllResults(1,:);
             GD.Results.Ell.b = EllResults(2,:);
     end
@@ -342,7 +340,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
             case 'perimeter'
                 % Plot the contours in 2D (Right subplot) for minimum perimeter
                 cla(rSP);
-                title(rSP, ['Min. perimeter of the contours in red: ' num2str(minD.Value) ' mm'])
+                title(rSP, ['Min. perimeter of the contours in red: ' num2str(minD.Value,'%.1f') ' mm'])
                 hold(rSP,'on')
                 % Plot contours in 2D
                 C2D_Handle = arrayfun(@(x) plot(rSP, x.xyz(:,1),x.xyz(:,2),'k'), MinNC.P,'uni',0);
@@ -368,7 +366,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
             case 'dispersion'
                 % Plot the ellipses in 2D (Right subplot) for minimum dispersion
                 cla(rSP);
-                title(rSP, ['Minimum dispersion of the centers: ' num2str(minD.Value) ' mm'])
+                title(rSP, ['Minimum dispersion of the centers: ' num2str(minD.Value,'%.2f') ' mm'])
                 hold(rSP,'on')
                 % Plot the ellipses in 2D
                 for c=1:NoP
@@ -381,7 +379,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
                 hold(lSP,'on')
                 % Plot contours, ellipses & foci in 3D for minimum dispersion
                 for c=1:NoP
-                    ANA_VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, 'm');
+                    FNA_VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, 'm');
                 end
                 
                 % Plot centers in 3D for minimum dispersion
