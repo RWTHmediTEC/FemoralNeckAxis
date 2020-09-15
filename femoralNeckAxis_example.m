@@ -28,15 +28,15 @@ NeckOrthogonal=createLine3d(...
 
 %% Select different options by commenting 
 % Default mode
-[ANAxis, ANATFM] = ANA(femur.vertices, femur.faces, Side, NeckAxis, ShaftAxis, ...
+[FNAxis, FNATFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
     'Subject', num2str(Idx));
 % Silent mode
-% [ANAxis, ANATFM] = ANA(femur.vertices, femur.faces, Side, NeckAxis, ShaftAxis, ...
+% [FNAxis, FNATFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
 %     'Subject', num2str(Idx), 'Visu', false, 'Verbose', false);
 % Other options
-% [ANAxis, ANATFM] = ANA(femur.vertices, femur.faces, Side, NeckAxis, ShaftAxis, ...
+% [FNAxis, FNATFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
 %     'Subject', num2str(Idx), 'Objective', 'dispersion');
-% [ANAxis, ANATFM] = ANA(femur.vertices, femur.faces, Side, NeckAxis, ShaftAxis, ...
+% [FNAxis, FNATFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
 %     'PlaneVariationRange', 12, 'StepSize', 3);
 
 %% Visualization
@@ -55,8 +55,8 @@ BoneProps.EdgeLighting = 'none';
 BoneProps.FaceLighting = 'gouraud';
 patch(F(Idx).mesh, BoneProps);
 
-% ANAxis
-drawLine3d(ANAxis, 'b');
+% FNAxis
+drawLine3d(FNAxis, 'b');
 
 % Light
 light1 = light; light('Position', -1*(get(light1,'Position')));

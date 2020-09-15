@@ -1,10 +1,10 @@
-function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxis, shaftAxis, varargin)
-%ANA An optimization algorithm for establishing an anatomical neck axis (ANA)
+function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, varargin)
+%FEMORALNECKAXIS optimizes the femoral neck axis (FNA)
 %
 % INPUT:
 %   - REQUIRED:
-%     vertices - Double [Nx3]: A list of points of the femoral neck mesh
-%     faces - Integer [Mx3]: A list of triangle faces, indexing into the vertices
+%     femur - struct: A clean mesh of the distal femur defined by the 
+%           fields vertices (double [Nx3]) and faces (integer [Mx3]) 
 %     side - Char: 'L' or 'R' femur
 %     neckAxis - Double [1x6]: Initial neck axis with the approximate
 %       center of the neck isthmus as origin
@@ -35,25 +35,27 @@ function [ANA, ANATFM] = ANA(vertices, faces, side, neckAxis, shaftAxis, varargi
 %     'Verbose' - Logical: Command window output. Default is true.
 %
 % OUTPUT:
-%     ANA - Double [1x6]: The optimized anatomical neck axis.
-%     ANATFM - Double [4x4]: Transformation of the bone into the neck axis CS
+%     FNA - Double [1x6]: The optimized anatomical neck axis.
+%     FNA_TFM - Double [4x4]: Transformation of the bone into the neck axis CS
 %
 % EXAMPLE:
-%     Run the file 'ANA_Example.m' or 'ANA_GUI.m'.
+%     Run the file 'femoralNeckAxis_example.m' or 'femoralNeckAxis_GUI.m'.
 %
 % TODO/IDEAS:
 %   - Parse variable NoCP
-%   - Add dropdown for GD.ANA_Algorithm.Objective to ANA_GUI.m
+%   - Add dropdown for GD.ANA_Algorithm.Objective to femoralNeckAxis_GUI.m
 %
 % AUTHOR: Maximilian C. M. Fischer
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
 % VERSION: 2.0.0
-% DATE: 2020-08-13
-% LICENSE: Modified BSD License (BSD license with non-military-use clause)
+% DATE: 2020-09-15
+% COPYRIGHT (C) 2016 - 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+% 
 
 % Validate inputs
 [Subject, PlaneVariationRange, StepSize, GD.ANA_Algorithm.Objective, GD.Visualization, GD.Verbose] = ...
-    validateAndParseOptInputs(vertices, faces, side, varargin{:});
+    validateAndParseOptInputs(femur, side, varargin{:});
 
 % USP path
 GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
@@ -124,8 +126,7 @@ if GD.Visualization == 1
 end
 
 %% Load Subject
-GD.Subject.Mesh.vertices = vertices;
-GD.Subject.Mesh.faces = faces;
+GD.Subject.Mesh = femur;
 GD.Subject.Side = side; % [L]eft or [R]ight
 GD.Subject.Name = Subject; % Subject name
 GD.Subject.NeckAxis = normalizeLine3d(neckAxis);
@@ -151,8 +152,8 @@ end
 GD = ANA_RoughFineIteration('no handle', GD);
 
 %% Results
-ANATFM = GD.Subject.TFM;
-ANA = GD.Results.ANA;
+FNA_TFM = GD.Subject.TFM;
+FNA = GD.Results.ANA;
 
 end
 
@@ -161,10 +162,10 @@ end
 % Parameter validation
 %==========================================================================
 function [Subject, PlaneVariationRange, StepSize, Objective, Visualization, Verbose] = ...
-    validateAndParseOptInputs(vertices, faces, side, varargin)
+    validateAndParseOptInputs(femur, side, varargin)
 
-validateattributes(vertices, {'numeric'},{'ncols', 3});
-validateattributes(faces, {'numeric'},{'integer','nonnegative','nonempty','ncols', 3});
+validateattributes(femur.vertices, {'numeric'},{'ncols', 3});
+validateattributes(femur.faces, {'numeric'},{'integer','nonnegative','nonempty','ncols', 3});
 validatestring(side, {'R','L'});
 
 % Parse the input P-V pairs
