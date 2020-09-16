@@ -3,8 +3,8 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 %
 % INPUT:
 %   - REQUIRED:
-%     femur - struct: A clean mesh of the distal femur defined by the 
-%       fields vertices (double [Nx3]) and faces (integer [Mx3]) 
+%     femur - struct: A clean mesh of the femur defined by the fields
+%       vertices (double [Nx3]) and faces (integer [Mx3]) 
 %     side - Char: 'L' or 'R' femur
 %     neckAxis - Double [1x6]: Initial femoral neck axis with the 
 %       approximate center of the neck isthmus as origin
