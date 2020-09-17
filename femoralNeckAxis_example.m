@@ -1,56 +1,48 @@
 clearvars; close all; opengl hardware
 
-%% Select subject
-Idx = 5;
+% Add src path
+addpath(genpath([fileparts([mfilename('fullpath'), '.m']) '\src']));
 
-load('data\F','F')
+%% Clone example data
+if ~exist('VSD', 'dir')
+    try
+        !git clone https://github.com/RWTHmediTEC/VSDFullBodyBoneModels VSD
+        rmdir('VSD/.git', 's')
+    catch
+        warning([newline 'Clone (or copy) the example data from: ' ...
+            'https://github.com/RWTHmediTEC/VSDFullBodyBoneModels' newline 'to: ' ...
+            fileparts([mfilename('fullpath'), '.m']) '\VSD' ...
+            ' and try again!' newline])
+        return
+    end
+end
 
-Subject=F(Idx);
+%% Load subject names
+load('VSD\MATLAB\res\VSD_Subjects.mat', 'Subjects')
+Subjects = table2cell(Subjects);
+Subjects(1:2:20,4) = {'L'}; Subjects(2:2:20,4) = {'R'};
 
-% Read subject surface data and store
-femur = F(Idx).mesh;
-Side = F(Idx).side;
-
-% Create the neck axis from the vertex indices
-NeckAxis = F(Idx).LM.NeckAxis;
-% Create the shaft axis from the vertex indices
-ShaftAxis = F(Idx).LM.ShaftAxis;
-
-%% Select different options by commenting 
-% Default mode
-[FNAxis, FNA_TFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
-    'Subject', num2str(Idx));
-% Silent mode
-% [FNAxis, FNA_TFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
-%     'Subject', num2str(Idx), 'Visu', false, 'Verbose', false);
-% Other options
-% [FNAxis, FNA_TFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
-%     'Subject', num2str(Idx), 'Objective', 'dispersion');
-% [FNAxis, FNA_TFM] = femoralNeckAxis(femur, Side, NeckAxis, ShaftAxis, ...
-%     'PlaneVariationRange', 12, 'StepSize', 3);
-
-%% Visualization
-figure('Units','pixels','Color','w','ToolBar','figure','Position',[680 50 560 420],...
-'WindowScrollWheelFcn',@M_CB_Zoom,'WindowButtonDownFcn',@M_CB_RotateWithMouse,...
-    'renderer','opengl');
-axes('Color','w'); axis on equal;
-xlabel('X [mm]'); ylabel('Y [mm]'); zlabel('Z [mm]');
-cameratoolbar('SetCoordSys','none')
-
-% Bone
-BoneProps.EdgeColor = 'none';
-BoneProps.FaceColor = [0.882, 0.831, 0.753];
-BoneProps.FaceAlpha = 0.7;
-BoneProps.EdgeLighting = 'none';
-BoneProps.FaceLighting = 'gouraud';
-patch(F(Idx).mesh, BoneProps);
-
-% FNAxis
-drawLine3d(FNAxis, 'b');
-
-% Light
-light1 = light; light('Position', -1*(get(light1,'Position')));
-
+for s=7%:size(Subjects, 1)
+    
+    % Prepare distal femur
+    load(['VSD\Bones\' Subjects{s,1} '.mat'], 'B');
+    load(['data\' Subjects{s,1} '.mat'],'NeckAxis','ShaftAxis');
+    femur = B(ismember({B.name}, ['Femur_' Subjects{s,4}])).mesh;
+    
+    %% Select different options by commenting
+    % Default mode
+    [FNAxis, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
+        'Subject',Subjects{s,1});
+    % Silent mode
+    % [FNAxis, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
+    %    'Subject',Subjects{s,1}, 'Visu', false, 'Verbose', false);
+    % Other options
+    % [FNAxis, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
+    %    'Subject',Subjects{s,1}, 'Objective', 'dispersion');
+    % [FNAxis, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
+    %    'Subject',Subjects{s,1}, 'PlaneVariationRange', 12, 'StepSize', 3);
+    
+end
 
 % [List.f, List.p] = matlab.codetools.requiredFilesAndProducts([mfilename '.m']);
 % List.f = List.f'; List.p = List.p';
