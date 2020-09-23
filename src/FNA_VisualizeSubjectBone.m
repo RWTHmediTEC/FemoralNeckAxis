@@ -1,12 +1,16 @@
 function GD = FNA_VisualizeSubjectBone(GD)
-
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
 
 H3D = GD.Figure.D3Handle;
 hold(H3D, 'on')
 
 %% Plot the bone as patch object
 boneProps.EdgeColor = 'none';
-boneProps.FaceColor = [0.882, 0.831, 0.753];
+boneProps.FaceColor = [223, 206, 161]/255;
 boneProps.FaceAlpha = 0.7;
 boneProps.EdgeLighting = 'none';
 boneProps.FaceLighting = 'gouraud';

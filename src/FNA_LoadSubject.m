@@ -1,4 +1,9 @@
 function GD = FNA_LoadSubject(hObject, GD)
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
 
 if ishandle(hObject)
     GD = guidata(hObject);
@@ -28,11 +33,11 @@ TRANS = createTranslation3d(-GD.Subject.initalNeckAxis(1:3));
 ROT = createRotationVector3d(GD.Subject.initalNeckAxis(4:6),[0 0 1]);
 GD.Subject.TFM = ROT*TRANS;
 
-
-if GD.Visualization == 1
-    %% Configure subplots
+if GD.Visualization
+    % Inital view of the 3D plot
     GD.Subject.ViewVector(1,:)= normalizeVector3d(GD.Subject.ShaftAxis(4:6));
-    GD.Subject.ViewVector(2,:)= normalizeVector3d(crossProduct3d(GD.Subject.ViewVector(1,:),GD.Subject.initalNeckAxis(4:6)));
+    GD.Subject.ViewVector(2,:)= normalizeVector3d(...
+        crossProduct3d(GD.Subject.ViewVector(1,:),GD.Subject.initalNeckAxis(4:6)));
     GD.Subject.ViewVector = transformVector3d(GD.Subject.ViewVector, GD.Subject.TFM);
     if GD.Subject.ViewVector(1,3) > 0
         GD.Subject.ViewVector(1,:)=-GD.Subject.ViewVector(1,:);
@@ -49,7 +54,12 @@ if GD.Visualization == 1
                 GD.Subject.ViewVector(2,:) = -GD.Subject.ViewVector(2,:);
             end
     end
-    set(GD.Figure.Handle, 'Name', [Side ' femur of subject: ' GD.Subject.Name]);
+    GD.Figure.Handle.Name = [Side ' femur of subject: ' GD.Subject.Name];
+    
+    % Clear dispersion plot
+    ClearPlot(GD.Figure.DispersionHandle, {'Surf'})
+    GD.Figure.DispersionHandle.Visible = 'off';
+    
     % Clear 2D plot
     H2D = GD.Figure.D2Handle;
     cla(H2D, 'reset');

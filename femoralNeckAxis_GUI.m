@@ -1,6 +1,10 @@
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
+
 clearvars; close all; clc; opengl hardware;
-% [List.f, List.p] = matlab.codetools.requiredFilesAndProducts([mfilename '.m']);
-% List.f = List.f'; List.p = List.p';
 
 % USP path
 GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
@@ -118,7 +122,7 @@ uicontrol('Style', 'popup', 'String', objectives,...
 GD.FNA_Algorithm.EllipsePlot = 0;
 uicontrol('Style','checkbox','Units','normalized','BackgroundColor','w',...
     'Position',[0.95-BSX*6/3 0.97 BSX BSY],FontPropsB,...
-    'String','Plot neck cuts in 2D',...
+    'String','Plot neck cuts',...
     'Callback',@FNA_CB_EllipsePlot,'Value',0);
 GD.FNA_Algorithm.PlotPlaneVariation = 0;
 uicontrol('Style','checkbox','Units','normalized','BackgroundColor','w',...
@@ -165,3 +169,7 @@ GD.Results.B_H_SaveResults = ...
 
 %% Guidata to share data among callbacks
 guidata(FH, GD);
+
+
+% [List.f, List.p] = matlab.codetools.requiredFilesAndProducts([mfilename '.m']);
+% List.f = List.f'; List.p = List.p';
