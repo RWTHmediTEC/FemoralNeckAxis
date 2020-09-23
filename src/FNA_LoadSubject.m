@@ -4,16 +4,14 @@ if ishandle(hObject)
     GD = guidata(hObject);
     
     % Subject data path
-    GD.Subject.PathMAT = [GD.ToolPath GD.Subject.DataPath];
+    for p=1:length(GD.Subject.DataPath)
+        load([GD.ToolPath GD.Subject.DataPath{p}, GD.Subject.Name '.mat']) %#ok<LOAD>
+    end
     
-    load(GD.Subject.PathMAT,'F')
-    Subject=F(str2double(GD.Subject.Name));
     % Store subject data
-    GD.Subject.Mesh.vertices = Subject.mesh.vertices;
-    GD.Subject.Mesh.faces = Subject.mesh.faces;
-    GD.Subject.Side = upper(Subject.side(1));
-    GD.Subject.NeckAxis = Subject.LM.NeckAxis;
-    GD.Subject.ShaftAxis = Subject.LM.ShaftAxis;
+    GD.Subject.Mesh = B(ismember({B.name}, ['Femur_' GD.Subject.Side])).mesh;
+    GD.Subject.NeckAxis = NeckAxis;
+    GD.Subject.ShaftAxis = ShaftAxis;
 end
 
 %% Check direction of neck and shaft axis
@@ -31,7 +29,6 @@ ROT = createRotationVector3d(GD.Subject.initalNeckAxis(4:6),[0 0 1]);
 GD.Subject.TFM = ROT*TRANS;
 
 
-
 if GD.Visualization == 1
     %% Configure subplots
     GD.Subject.ViewVector(1,:)= normalizeVector3d(GD.Subject.ShaftAxis(4:6));
@@ -44,38 +41,38 @@ if GD.Visualization == 1
         case 'R'
             Side = 'Right';
             if GD.Subject.ViewVector(2,2) < 0
-                GD.Subject.ViewVector(2,:)=-GD.Subject.ViewVector(2,:);
+                GD.Subject.ViewVector(2,:) = -GD.Subject.ViewVector(2,:);
             end
         case 'L'
             Side = 'Left';
             if GD.Subject.ViewVector(2,2) < 0
-                GD.Subject.ViewVector(2,:)=-GD.Subject.ViewVector(2,:);
+                GD.Subject.ViewVector(2,:) = -GD.Subject.ViewVector(2,:);
             end
     end
     set(GD.Figure.Handle, 'Name', [Side ' femur of subject: ' GD.Subject.Name]);
-    % Clear right subplot
-    rSP = GD.Figure.RightSpHandle;
-    cla(rSP, 'reset');
-    axis(rSP,'on','equal');
-    grid(rSP,'on');
-    xlabel(rSP,'X [mm]'); ylabel(rSP,'Y [mm]');
-    set(rSP, 'Color', GD.Figure.Color);
+    % Clear 2D plot
+    H2D = GD.Figure.D2Handle;
+    cla(H2D, 'reset');
+    axis(H2D,'on','equal');
+    grid(H2D,'on');
+    xlabel(H2D,'X [mm]'); ylabel(H2D,'Y [mm]');
+    set(H2D, 'Color', GD.Figure.Color);
     
-    % Left subject subplot and properties
-    lSP = GD.Figure.LeftSpHandle;
-    cla(lSP,'reset');
-    xlabel(lSP,'X [mm]'); ylabel(lSP,'Y [mm]'); zlabel(lSP,'Z [mm]');
-    axis(lSP,'off');
-    set(lSP,'Color',GD.Figure.Color);
-    light1 = light(lSP); light(lSP, 'Position', -1*(get(light1,'Position')));
+    % Left 3D plot and properties
+    H3D = GD.Figure.D3Handle;
+    cla(H3D,'reset');
+    xlabel(H3D,'X [mm]'); ylabel(H3D,'Y [mm]'); zlabel(H3D,'Z [mm]');
+    axis(H3D,'off');
+    set(H3D,'Color',GD.Figure.Color);
+    light1 = light(H3D); light(H3D, 'Position', -1*(get(light1,'Position')));
     cameratoolbar('SetCoordSys','none')
     
     %% Visualize Subject Bone with the Default Neck Plane (DNP)
     GD = FNA_VisualizeSubjectBone(GD);
-    axis(lSP,'equal');
+    axis(H3D,'equal');
     
     % Plot a dot into the Point of Origin
-    scatter3(lSP, 0,0,0,'k','filled')
+    scatter3(H3D, 0,0,0,'k','filled')
 end
 
 if ishandle(hObject); guidata(hObject,GD); end

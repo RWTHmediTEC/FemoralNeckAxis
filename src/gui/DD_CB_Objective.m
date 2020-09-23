@@ -1,4 +1,4 @@
-function DD_CB_Subject(hObject, ~, Subjects)
+function DD_CB_Objective(hObject, ~)
 %
 % AUTHOR: Maximilian C. M. Fischer
 % COPYRIGHT (C) 2020 Maximilian C. M. Fischer
@@ -6,9 +6,7 @@ function DD_CB_Subject(hObject, ~, Subjects)
 %
 
 GD = guidata(hObject);
-Index = get(hObject,'Value');
-GD.Subject.Name = Subjects{Index,1};
-GD.Subject.Side = Subjects{Index,4};
+GD.FNA_Algorithm.Objective = hObject.String{hObject.Value};
 guidata(hObject,GD);
 
 set(GD.Results.B_H_SaveResults,'Enable','off')

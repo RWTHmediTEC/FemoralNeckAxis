@@ -4,13 +4,13 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 % INPUT:
 %   - REQUIRED:
 %     femur - struct: A clean mesh of the femur defined by the fields
-%       vertices (double [Nx3]) and faces (integer [Mx3]) 
+%       vertices (double [Nx3]) and faces (integer [Mx3])
 %     side - Char: 'L' or 'R' femur
-%     neckAxis - Double [1x6]: Initial femoral neck axis with the 
+%     neckAxis - Double [1x6]: Initial femoral neck axis with the
 %       approximate center of the neck isthmus as origin
-%     shaftAxis - Double [1x6]: Initial femoral shaft axis with the 
+%     shaftAxis - Double [1x6]: Initial femoral shaft axis with the
 %       approximate middle of the shaft as origin
-%     
+%
 %   - ADDITIONAL:
 %     'Subject' - Char: Identification of the subject. Default is 'anonymous'.
 %     'PlaneVariationRange' - Integer [1x1]: Defines the size of the search
@@ -29,7 +29,7 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 %                  ((4° x 2 / 2°) + 1)² = 25 plane variations
 %     'Objective' - Char: The objective of the iteration process:
 %                         'perimeter': min. perimiter of the neck (default)
-%                         'dispersion': min. dispersion of centers of 
+%                         'dispersion': min. dispersion of centers of
 %                                     ellipses fitted to countours of neck.
 %     'Visualization' - Logical: Figure output. Default is true.
 %     'Verbose' - Logical: Command window output. Default is true.
@@ -42,7 +42,7 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 %     Run the file 'femoralNeckAxis_example.m' or 'femoralNeckAxis_GUI.m'.
 %
 % TODO/IDEAS:
-%   - Parse variable NoCP
+%   - Parse variable NeckAxis, ShaftAxis, NoCP
 %   - Complete header sections
 %
 % AUTHOR: Maximilian C. M. Fischer
@@ -51,11 +51,12 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 % DATE: 2020-09-15
 % COPYRIGHT (C) 2017 - 2020 Maximilian C. M. Fischer
 % LICENSE: EUPL v1.2
-% 
+%
 
 % Validate inputs
-[Subject, PlaneVariationRange, StepSize, ...
-    GD.FNA_Algorithm.Objective, GD.Visualization, GD.Verbose] = ...
+[GD.Subject.Side, GD.Subject.Name, ...
+    GD.FNA_Algorithm.PlaneVariationRange, GD.FNA_Algorithm.StepSize, GD.FNA_Algorithm.Objective, ...
+    GD.Visualization, GD.Verbose] = ...
     validateAndParseOptInputs(femur, side, varargin{:});
 
 % FNA path
@@ -96,49 +97,41 @@ if GD.Visualization == 1
     GD.Figure.Handle = FH;
     set(0,'defaultAxesFontSize',14)
     
-    %% 3D view
-    LeftP = uipanel('Title','3D view','FontSize',14,'BorderWidth',2,...
+    % 3D view
+    LP = uipanel('Title','3D view','FontSize',14,'BorderWidth',2,...
         'BackgroundColor',GD.Figure.Color,'Position',[0.01 0.01 0.49 0.99]);
-    GD.Figure.LeftSpHandle = axes('Parent', LeftP, 'Visible','off', 'Color',GD.Figure.Color);
+    GD.Figure.D3Handle = axes('Parent', LP, 'Visible','off', 'Color',GD.Figure.Color);
     
-    %% 2D view
+    % 2D view
     RPT = uipanel('Title','2D view','FontSize',14,'BorderWidth',2,...
         'BackgroundColor',GD.Figure.Color,'Position',[0.51 0.51 0.48 0.49]);
     RH = axes('Parent', RPT, 'Visible','off', 'Color',GD.Figure.Color);
     axis(RH, 'on'); axis(RH, 'equal'); grid(RH, 'on'); xlabel(RH, 'X [mm]'); ylabel(RH, 'Y [mm]');
-    GD.Figure.RightSpHandle = RH;
+    GD.Figure.D2Handle = RH;
     
-    %% Convergence plot
     % A convergence plot as a function of alpha (a) and beta (b).
-        RPB = uipanel('Title','Convergence progress','FontSize',14,'BorderWidth',2,...
+    RPB = uipanel('Title','Convergence progress','FontSize',14,'BorderWidth',2,...
         'BackgroundColor',GD.Figure.Color,'Position',[0.51 0.01 0.48 0.49]);
-        IH = axes('Parent', RPB, 'Visible','off', 'Color',GD.Figure.Color);
-        axis(IH, 'equal', 'tight'); view(IH,3);
-        xlabel(IH,'\alpha [°]');
-        ylabel(IH,'\beta [°]');
-        zlabel(IH, [GD.FNA_Algorithm.Objective ' [mm]'])
-        switch GD.FNA_Algorithm.Objective
-            case 'dispersion'
-                title(IH, 'Dispersion of the ellipse centers as function of \alpha & \beta')
-            case 'perimeter'
-                title(IH, 'Min. perimeter of the contours as function of \alpha & \beta')
-        end
-        GD.Results.AxHandle = IH;
+    IH = axes('Parent', RPB, 'Visible','off', 'Color',GD.Figure.Color);
+    axis(IH, 'equal', 'tight'); view(IH,3);
+    xlabel(IH,'\alpha [°]');
+    ylabel(IH,'\beta [°]');
+    zlabel(IH, [GD.FNA_Algorithm.Objective ' [mm]'])
+    switch GD.FNA_Algorithm.Objective
+        case 'dispersion'
+            title(IH, 'Dispersion of the ellipse centers as function of \alpha & \beta')
+        case 'perimeter'
+            title(IH, 'Min. perimeter of the contours as function of \alpha & \beta')
+    end
+    GD.Figure.DispersionHandle = IH;
 end
 
 %% Load Subject
 GD.Subject.Mesh = femur;
-GD.Subject.Side = side; % [L]eft or [R]ight
-GD.Subject.Name = Subject; % Subject name
 GD.Subject.NeckAxis = normalizeLine3d(neckAxis);
 GD.Subject.ShaftAxis = normalizeLine3d(shaftAxis);
 
 GD = FNA_LoadSubject('no handle', GD);
-
-%% Settings for the framework
-% Iteration settings
-GD.FNA_Algorithm.PlaneVariationRange = PlaneVariationRange;
-GD.FNA_Algorithm.StepSize = StepSize;
 
 % Visualization settings
 if GD.Visualization == 1
@@ -162,12 +155,14 @@ end
 %==========================================================================
 % Parameter validation
 %==========================================================================
-function [Subject, PlaneVariationRange, StepSize, Objective, Visualization, Verbose] = ...
-    validateAndParseOptInputs(femur, side, varargin)
+function [Side, Subject, PlaneVariationRange, StepSize, Objective, Visualization, Verbose] = ...
+    validateAndParseOptInputs(Femur, Side, varargin)
 
-validateattributes(femur.vertices, {'numeric'},{'ncols', 3});
-validateattributes(femur.faces, {'numeric'},{'integer','nonnegative','nonempty','ncols', 3});
-validatestring(upper(side(1)), {'R','L'});
+Side = upper(Side(1)); % [L]eft or [R]ight
+
+validateattributes(Femur.vertices, {'numeric'},{'ncols', 3});
+validateattributes(Femur.faces, {'numeric'},{'integer','nonnegative','nonempty','ncols', 3});
+validatestring(Side, {'R','L'});
 
 % Parse the input P-V pairs
 defaults = struct(...

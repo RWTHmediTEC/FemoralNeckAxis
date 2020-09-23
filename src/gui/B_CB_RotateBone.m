@@ -4,7 +4,7 @@ GD = guidata(hObject);
 if isfield(GD.Subject,'PatchHandle')
     
     GD.Subject.PatchHandle.HandleVisibility='on';
-    ClearPlot(GD.Figure.LeftSpHandle, {'Patch','Scatter','Line'})
+    ClearPlot(GD.Figure.D3Handle, {'Patch','Scatter','Line'})
     
     % Calculate the Rotation Matrix for the plane variation
     %                                (Z-Axis,Y-Axis,X-Axis)

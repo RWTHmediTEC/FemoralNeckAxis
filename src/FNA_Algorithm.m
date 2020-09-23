@@ -19,13 +19,13 @@ function GD = FNA_Algorithm(GD)
 visu = GD.Visualization;
 if visu == 1
     % Figure & subplot handles
-    lSP = GD.Figure.LeftSpHandle;
-    rSP = GD.Figure.RightSpHandle;
+    H3D = GD.Figure.D3Handle;
+    H2D = GD.Figure.D2Handle;
     % Clear subplots
     % Right
-    title(rSP,''); cla(rSP)
+    title(H2D,''); cla(H2D)
     % Left
-    title(lSP,''); ClearPlot(lSP, {'Patch','Scatter','Line'})
+    title(H3D,''); ClearPlot(H3D, {'Patch','Scatter','Line'})
 end
 
 %% Settings
@@ -145,30 +145,30 @@ for I_a = 1:RangeLength_a
                     % RIGHT subplot: Plot the ellipses in 2D in the XY-plane
                     if EllipsePlot == 1
                         % Clear right subplot
-                        cla(rSP);
-                        hold(rSP,'on')
+                        cla(H2D);
+                        hold(H2D,'on')
                         % Plot contours in 2D
-                        C2D_Handle=arrayfun(@(x) plot(rSP, x.xyz(:,1),x.xyz(:,2),'k'), NC.P,'uni',0);
+                        C2D_Handle=arrayfun(@(x) plot(H2D, x.xyz(:,1),x.xyz(:,2),'k'), NC.P,'uni',0);
                         [~, minPlaneIdx] = min([NC.P.length]);
                         % Set color of min. perimeter to red
                         C2D_Handle{minPlaneIdx}.Color='r';
                         C2D_Handle{minPlaneIdx}.LineWidth=2;
-                        hold(rSP,'off')
+                        hold(H2D,'off')
                     end
                     
                     % LEFT Subplot: Plot plane variation, contour-parts, ellipses in 3D
-                    ClearPlot(lSP, {'Patch','Scatter','Line'})
+                    ClearPlot(H3D, {'Patch','Scatter','Line'})
                     % Plot the plane variation
                     if PlotPlaneVariation == 1
-                        title(lSP, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
+                        title(H3D, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
                             '\beta = '  num2str(Range_b(I_b)) '°.'])
-                        drawPlatform(lSP, createPlane([0, 0, 0], PlaneNormal),100,...
+                        drawPlatform(H3D, createPlane([0, 0, 0], PlaneNormal),100,...
                             'FaceColor','g','FaceAlpha', 0.5);
                     end
                     % Plot contour-parts & ellipses
                     if EllipsePlot == 1
                         C3D = arrayfun(@(x) transformPoint3d(x.xyz, NC.PRM), NC.P,'uni',0);
-                        C3D_Handle = cellfun(@(x) plot3(lSP, x(:,1),x(:,2),x(:,3),'k'), C3D,'uni',0);
+                        C3D_Handle = cellfun(@(x) plot3(H3D, x(:,1),x(:,2),x(:,3),'k'), C3D,'uni',0);
                         % Set color of min. perimeter to red
                         C3D_Handle{minPlaneIdx}.Color='r';
                         C3D_Handle{minPlaneIdx}.LineWidth=2;
@@ -209,28 +209,28 @@ for I_a = 1:RangeLength_a
                     % RIGHT subplot: Plot the ellipses in 2D in the XY-plane
                     if EllipsePlot == 1
                         % Clear right subplot
-                        cla(rSP);
-                        hold(rSP,'on')
+                        cla(H2D);
+                        hold(H2D,'on')
                         % Plot the ellipses in 2D
                         for c=1:NoP
-                            VisualizeEll2D(rSP, NC.P(c), 'm');
+                            FNA_VisualizeEll2D(H2D, NC.P(c), 'm');
                         end
-                        hold(rSP,'off')
+                        hold(H2D,'off')
                     end
                     
                     % LEFT Subplot: Plot plane variation, contour-parts, ellipses in 3D
-                    ClearPlot(lSP, {'Patch','Scatter','Line'})
+                    ClearPlot(H3D, {'Patch','Scatter','Line'})
                     % Plot the plane variation
                     if PlotPlaneVariation == 1
-                        title(lSP, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
+                        title(H3D, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
                             '\beta = '  num2str(Range_b(I_b)) '°.'])
-                        drawPlatform(lSP, createPlane([0, 0, 0], PlaneNormal),100,...
+                        drawPlatform(H3D, createPlane([0, 0, 0], PlaneNormal),100,...
                             'FaceColor','g','FaceAlpha', 0.5);
                     end
                     % Plot contour-parts & ellipses
                     if EllipsePlot == 1
                         for c=1:NoP
-                            FNA_VisualizeContEll3D(lSP, NC.P(c), NC.PRM, 'm');
+                            FNA_VisualizeContEll3D(H3D, NC.P(c), NC.PRM, 'm');
                         end
                     end
                     drawnow
@@ -262,12 +262,12 @@ end
 if sum(sum(~isnan(R.(Objective))))>=4
     if visu == 1
         % dispersion plot
-        GD.Results.AxHandle.Visible = 'on';
-        hold(GD.Results.AxHandle,'on')
+        GD.Figure.DispersionHandle.Visible = 'on';
+        hold(GD.Figure.DispersionHandle,'on')
         [Surf2.X, Surf2.Y] = meshgrid(Range_a, Range_b);
         Surf2.X = Surf2.X + GD.Results.OldDMin(1);
         Surf2.Y = Surf2.Y + GD.Results.OldDMin(2);
-        surf(GD.Results.AxHandle, Surf2.X', Surf2.Y', R.(Objective))
+        surf(GD.Figure.DispersionHandle, Surf2.X', Surf2.Y', R.(Objective))
     end
        
     % Searching the cutting plane with minimum dispersion
@@ -331,62 +331,62 @@ if sum(sum(~isnan(R.(Objective))))>=4
     if visu == 1
         % Results in the main figure
         % Plot the cutting plane with minimum dispersion (Left subplot)
-        ClearPlot(lSP, {'Patch','Scatter','Line'})
+        ClearPlot(H3D, {'Patch','Scatter','Line'})
         PlaneNormal = transformVector3d([0 0 1],MinNC.PRM);
-        drawPlatform(lSP, createPlane([0 0 0], PlaneNormal),100,...
+        drawPlatform(H3D, createPlane([0 0 0], PlaneNormal),100,...
             'FaceColor','w','FaceAlpha', 0.5);
         
         switch Objective
             case 'perimeter'
                 % Plot the contours in 2D (Right subplot) for minimum perimeter
-                cla(rSP);
-                title(rSP, ['Min. perimeter of the contours in red: ' num2str(minD.Value,'%.1f') ' mm'])
-                hold(rSP,'on')
+                cla(H2D);
+                title(H2D, ['Min. perimeter of the contours in red: ' num2str(minD.Value,'%.1f') ' mm'])
+                hold(H2D,'on')
                 % Plot contours in 2D
-                C2D_Handle = arrayfun(@(x) plot(rSP, x.xyz(:,1),x.xyz(:,2),'k'), MinNC.P,'uni',0);
+                C2D_Handle = arrayfun(@(x) plot(H2D, x.xyz(:,1),x.xyz(:,2),'k'), MinNC.P,'uni',0);
                 [~, minPlaneIdx] = min([MinNC.P.length]);
                 % Set color of min. perimeter to red
                 C2D_Handle{minPlaneIdx}.Color='r';
                 C2D_Handle{minPlaneIdx}.LineWidth=2;
                 % Plot centroid in 2D for min. perimeter
-                scatter(rSP, PeriCen2D(1),PeriCen2D(2),'r','filled', 'tag', 'SPN')
+                scatter(H2D, PeriCen2D(1),PeriCen2D(2),'r','filled', 'tag', 'SPN')
                 
                 % Plot min. perimeter in 3D
-                title(lSP, 'Normal of the isthmus plane (min. perimeter)')
-                hold(lSP,'on')
+                title(H3D, 'Normal of the isthmus plane (min. perimeter)')
+                hold(H3D,'on')
                 C3D = arrayfun(@(x) transformPoint3d(x.xyz, MinNC.PRM), MinNC.P,'uni',0);
-                C3D_Handle = cellfun(@(x) plot3(lSP, x(:,1),x(:,2),x(:,3),'k'), C3D,'uni',0);
+                C3D_Handle = cellfun(@(x) plot3(H3D, x(:,1),x(:,2),x(:,3),'k'), C3D,'uni',0);
                 % Set color of min. perimeter to red
                 C3D_Handle{minPlaneIdx}.Color='r';
                 C3D_Handle{minPlaneIdx}.LineWidth=2;
                 % Plot centroid in 3D for min. perimeter
-                scatter3(lSP, PeriCen3D(1),PeriCen3D(2),PeriCen3D(3),'r','filled', 'tag', 'SPN')
+                scatter3(H3D, PeriCen3D(1),PeriCen3D(2),PeriCen3D(3),'r','filled', 'tag', 'SPN')
                 % Plot contour normal of the minimum perimeter
-                drawLine3d(lSP, GD.Results.CenterLine, 'color','r', 'tag','SPN');
+                drawLine3d(H3D, GD.Results.CenterLine, 'color','r', 'tag','SPN');
             case 'dispersion'
                 % Plot the ellipses in 2D (Right subplot) for minimum dispersion
-                cla(rSP);
-                title(rSP, ['Minimum dispersion of the centers: ' num2str(minD.Value,'%.2f') ' mm'])
-                hold(rSP,'on')
+                cla(H2D);
+                title(H2D, ['Minimum dispersion of the centers: ' num2str(minD.Value,'%.2f') ' mm'])
+                hold(H2D,'on')
                 % Plot the ellipses in 2D
                 for c=1:NoP
-                    VisualizeEll2D(rSP, MinNC.P(c), 'm');
+                    FNA_VisualizeEll2D(H2D, MinNC.P(c), 'm');
                 end
-                hold(rSP,'off')
+                hold(H2D,'off')
                 
                 % Delete old 3D ellipses & contours, if exist
-                title(lSP, 'Line fit through the centers for minimum dispersion')
-                hold(lSP,'on')
+                title(H3D, 'Line fit through the centers for minimum dispersion')
+                hold(H3D,'on')
                 % Plot contours, ellipses & foci in 3D for minimum dispersion
                 for c=1:NoP
-                    FNA_VisualizeContEll3D(lSP, MinNC.P(c), MinNC.PRM, 'm');
+                    FNA_VisualizeContEll3D(H3D, MinNC.P(c), MinNC.PRM, 'm');
                 end
                 
                 % Plot centers in 3D for minimum dispersion
-                scatter3(lSP, EllpCen3D(:,1),EllpCen3D(:,2),EllpCen3D(:,3),'b','filled', 'tag', 'CEA')
+                scatter3(H3D, EllpCen3D(:,1),EllpCen3D(:,2),EllpCen3D(:,3),'b','filled', 'tag', 'CEA')
                 
                 % Plot axis through the centers for minimum dispersion
-                drawLine3d(lSP, GD.Results.CenterLine, 'color','b', 'tag','CEA');
+                drawLine3d(H3D, GD.Results.CenterLine, 'color','b', 'tag','CEA');
         end
         drawnow
         

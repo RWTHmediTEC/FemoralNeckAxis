@@ -1,4 +1,9 @@
 function Ells = FitEllipseParfor(ContourParts, verbose)
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
 
 Ells = nan(5, size(ContourParts,1));
 parfor p=1:length(ContourParts)

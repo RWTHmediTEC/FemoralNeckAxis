@@ -1,5 +1,15 @@
 function GD = FNA_RoughFineIteration(hObject, GD)
-if ishandle(hObject); GD = guidata(hObject); end
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
+
+if ishandle(hObject)
+    GD = guidata(hObject);
+    ClearPlot(GD.Figure.DispersionHandle, {'Surf'})
+    GD.Figure.DispersionHandle.Visible = 'off';
+end
 
 % Variable to save the rotation values during the rough iterations
 GD.Results.OldDMin(1) = 0; GD.Results.OldDMin(2) = 0;
@@ -16,8 +26,8 @@ while GD.Iteration.Rough == 1
     GD.Subject.TFM = GD.Results.PlaneRotMat*GD.Subject.TFM;
     if GD.Visualization == 1
         % Clear left subplot
-        title(GD.Figure.LeftSpHandle,'');
-        ClearPlot(GD.Figure.LeftSpHandle, {'Patch','Scatter','Line'})
+        title(GD.Figure.D3Handle,'');
+        ClearPlot(GD.Figure.D3Handle, {'Patch','Scatter','Line'})
         delete(GD.Subject.PatchHandle);
         delete(GD.DNPlaneHandle);
         % Plot bone with newest transformation
