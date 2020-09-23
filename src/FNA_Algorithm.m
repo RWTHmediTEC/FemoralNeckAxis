@@ -313,7 +313,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
             EllpCen3D = nan(NoP,3);
             for c=1:NoP
                 % Save the ellipse center for the Line fit
-                EllpCen3D(c,:) = CalculatePointInEllipseIn3D(...
+                EllpCen3D(c,:) = CalculatePointInEllipse3D(...
                     MinNC.P(c).Ell.z, MinNC.P(c).xyz(1,3), MinNC.PRM);
             end
             

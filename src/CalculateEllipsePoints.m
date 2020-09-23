@@ -1,4 +1,10 @@
 function points = CalculateEllipsePoints(z, a, b, alpha, npts)
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
+
 % Form the parameter vector
 t = linspace(0, 2*pi, npts);
 % Rotation matrix
