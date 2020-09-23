@@ -1,4 +1,9 @@
 function Idx = lineToVertexIndices(line, mesh)
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
 
 [linePts, linePos] = intersectLineMesh3d(line, mesh.vertices, mesh.faces);
 [linePts, linePtsIdx] = unique(linePts,'rows','stable');

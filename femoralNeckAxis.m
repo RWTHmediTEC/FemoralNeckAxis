@@ -135,10 +135,10 @@ GD = FNA_LoadSubject('no handle', GD);
 
 % Visualization settings
 if GD.Visualization == 1
-    GD.FNA_Algorithm.PlaneVariaton = 1;
+    GD.FNA_Algorithm.PlotPlaneVariation = 1;
     GD.FNA_Algorithm.EllipsePlot = 1;
 elseif GD.Visualization == 0
-    GD.FNA_Algorithm.PlaneVariaton = 0;
+    GD.FNA_Algorithm.PlotPlaneVariation = 0;
     GD.FNA_Algorithm.EllipsePlot = 0;
 end
 

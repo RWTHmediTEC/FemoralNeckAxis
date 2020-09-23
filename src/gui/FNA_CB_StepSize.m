@@ -1,4 +1,4 @@
-function DD_CB_Objective(hObject, ~)
+function FNA_CB_StepSize(hObject, ~)
 %
 % AUTHOR: Maximilian C. M. Fischer
 % COPYRIGHT (C) 2020 Maximilian C. M. Fischer
@@ -6,8 +6,7 @@ function DD_CB_Objective(hObject, ~)
 %
 
 GD = guidata(hObject);
-GD.FNA_Algorithm.Objective = hObject.String{hObject.Value};
+Index = get(hObject,'Value');
+GD.FNA_Algorithm.StepSize = Index;
 guidata(hObject,GD);
-
-set(GD.Results.B_H_SaveResults,'Enable','off')
 end

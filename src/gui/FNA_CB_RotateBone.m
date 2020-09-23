@@ -1,4 +1,10 @@
-function B_CB_RotateBone(hObject, ~, Axis, Angle)
+function FNA_CB_RotateBone(hObject, ~, Axis, Angle)
+%
+% AUTHOR: Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% LICENSE: EUPL v1.2
+%
+
 GD = guidata(hObject);
 
 if isfield(GD.Subject,'PatchHandle')
@@ -7,7 +13,7 @@ if isfield(GD.Subject,'PatchHandle')
     ClearPlot(GD.Figure.D3Handle, {'Patch','Scatter','Line'})
     
     % Calculate the Rotation Matrix for the plane variation
-    %                                (Z-Axis,Y-Axis,X-Axis)
+    %                                (z axis,y axis,x axis)
     if     sum(Axis == [1, 0, 0]) == 3
         TFM = eulerAnglesToRotation3d(     0,     0,Angle);
     elseif sum(Axis == [0, 1, 0]) == 3
@@ -24,4 +30,4 @@ else
 end
 
 guidata(hObject,GD);
-
+end

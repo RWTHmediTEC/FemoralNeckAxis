@@ -38,7 +38,7 @@ Range_a = -PVR:StepSize:PVR;
 Range_b = -PVR:StepSize:PVR;
 
 % Plot Plane Variation
-PlotPlaneVariation = GD.FNA_Algorithm.PlaneVariaton;
+PlotPlaneVariation = GD.FNA_Algorithm.PlotPlaneVariation;
 
 % Plot Ellipses & Foci for each plane variation into the GUI figure
 EllipsePlot = GD.FNA_Algorithm.EllipsePlot;
