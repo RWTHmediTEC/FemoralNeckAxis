@@ -6,6 +6,6 @@ function FNA_CB_EllipsePlot(hObject, ~)
 %
 
 GD = guidata(hObject);
-GD.FNA_Algorithm.EllipsePlot = get(hObject,'Value');
+GD.Algorithm.EllipsePlot = get(hObject,'Value');
 guidata(hObject,GD);
 end

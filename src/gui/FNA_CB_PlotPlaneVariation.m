@@ -6,6 +6,6 @@ function FNA_CB_PlotPlaneVariation(hObject, ~)
 %
 
 GD = guidata(hObject);
-GD.FNA_Algorithm.PlotPlaneVariation = get(hObject,'Value');
+GD.Algorithm.PlotPlaneVariation = get(hObject,'Value');
 guidata(hObject,GD);
 end

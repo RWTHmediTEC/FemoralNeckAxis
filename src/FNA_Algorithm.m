@@ -30,21 +30,21 @@ end
 
 %% Settings
 % The angles are varied in StepSize° increments within following range:
-PVR = GD.FNA_Algorithm.PlaneVariationRange;
-StepSize = GD.FNA_Algorithm.StepSize;
+PVR = GD.Algorithm.PlaneVariationRange;
+StepSize = GD.Algorithm.StepSize;
 
 % Ranges
 Range_a = -PVR:StepSize:PVR;
 Range_b = -PVR:StepSize:PVR;
 
 % Plot Plane Variation
-PlotPlaneVariation = GD.FNA_Algorithm.PlotPlaneVariation;
+PlotPlaneVariation = GD.Algorithm.PlotPlaneVariation;
 
 % Plot Ellipses & Foci for each plane variation into the GUI figure
-EllipsePlot = GD.FNA_Algorithm.EllipsePlot;
+EllipsePlot = GD.Algorithm.EllipsePlot;
 
 % Objective of the iteration process
-Objective = GD.FNA_Algorithm.Objective;
+Objective = GD.Algorithm.Objective;
 
 %% START OF THE FRAMEWORK -------------------------------------------------
 % An optimization algorithm for establishing a femoral neck axis (FNA)
@@ -52,8 +52,8 @@ Objective = GD.FNA_Algorithm.Objective;
 % Bone Surface
 Bone = transformPoint3d(GD.Subject.Mesh, GD.Subject.TFM);
 
-% Number of Planes
-NoP = GD.Cond.NoPpC;
+% Number of Cutting Planes
+NoCP = GD.Algorithm.NoOfCuttingPlanes;
 
 % Neck Cuts (NC)
 % NC = [];
@@ -95,16 +95,16 @@ for I_a = 1:RangeLength_a
         
         % Create cutting plane origins
         NC.Origin = [0 0 0];
-        for p=1:NoP
+        for p=1:NoCP
             % Distance between the plane origins has to be 1 mm in the 
             % direction of the plane normal, e.g. for NoPpC = 9:
             % -4, -3, -2, -1, 0, +1, +2, +3, +4
-            NC.PlaneOrigins(p,:) = NC.Origin+(-(0.5+NoP/2)+p)*PlaneNormal;
+            NC.PlaneOrigins(p,:) = NC.Origin+(-(0.5+NoCP/2)+p)*PlaneNormal;
         end
         
         % Create NoP Neck Contour Profiles (NC.P)
         tempContour = IntersectMeshPlaneParfor(Bone, NC.PlaneOrigins, PlaneNormal);
-        for c=1:NoP
+        for c=1:NoCP
             % If there is more than one closed contour after the cut, use the longest one
             [~, IobC] = max(cellfun(@(x) sum(sqrt(sum(diff(x').^2,2))), tempContour{c}));
             NC.P(c).xyz = tempContour{c}{IobC}';
@@ -178,14 +178,14 @@ for I_a = 1:RangeLength_a
             case 'dispersion'
                 %% Algorithm 2
                 % A least-squares fitting algorithm for extracting geometric measures
-                Contours=cell(NoP,1);
-                for c=1:NoP
+                Contours=cell(NoCP,1);
+                for c=1:NoCP
                     % Part of the contour, that is used for fitting
                     Contours{c} = NC.P(c).xyz(:,1:2)';
                 end
                 % Parametric least-squares fitting and analysis of cross-sectional profiles
                 tempEll2D = FitEllipseParfor(Contours, GD.Verbose);
-                for c=1:NoP
+                for c=1:NoCP
                     NC.P(c).Ell.z = tempEll2D(1:2,c)';
                     NC.P(c).Ell.a = tempEll2D(3,c);
                     NC.P(c).Ell.b = tempEll2D(4,c);
@@ -193,8 +193,8 @@ for I_a = 1:RangeLength_a
                 end
                 
                 % Calculate the ellipse foci (Foci2D) and the major (A) & minor (B) axis points (AB)
-                Center2D = nan(NoP,2);
-                for c=1:NoP
+                Center2D = nan(NoCP,2);
+                for c=1:NoCP
                     [Foci2D, NC.P(c).Ell.AB] = CalculateEllipseFoci2D(...
                         NC.P(c).Ell.z', NC.P(c).Ell.a, NC.P(c).Ell.b, NC.P(c).Ell.g);
                     % Posterior Focus (pf): Foci2D(1,:), Anterior Focus (af): Foci2D(2,:)
@@ -212,7 +212,7 @@ for I_a = 1:RangeLength_a
                         cla(H2D);
                         hold(H2D,'on')
                         % Plot the ellipses in 2D
-                        for c=1:NoP
+                        for c=1:NoCP
                             FNA_VisualizeEll2D(H2D, NC.P(c), 'm');
                         end
                         hold(H2D,'off')
@@ -229,7 +229,7 @@ for I_a = 1:RangeLength_a
                     end
                     % Plot contour-parts & ellipses
                     if EllipsePlot == 1
-                        for c=1:NoP
+                        for c=1:NoCP
                             FNA_VisualizeContEll3D(H3D, NC.P(c), NC.PRM, 'm');
                         end
                     end
@@ -261,37 +261,37 @@ end
 %% Results
 if sum(sum(~isnan(R.(Objective))))>=4
     if visu == 1
-        % dispersion plot
+        % convergence plot
         GD.Figure.DispersionHandle.Visible = 'on';
         hold(GD.Figure.DispersionHandle,'on')
         [Surf2.X, Surf2.Y] = meshgrid(Range_a, Range_b);
-        Surf2.X = Surf2.X + GD.Results.OldDMin(1);
-        Surf2.Y = Surf2.Y + GD.Results.OldDMin(2);
+        Surf2.X = Surf2.X + GD.Iteration.OldMin(1);
+        Surf2.Y = Surf2.Y + GD.Iteration.OldMin(2);
         surf(GD.Figure.DispersionHandle, Surf2.X', Surf2.Y', R.(Objective))
     end
        
-    % Searching the cutting plane with minimum dispersion
-    [minD.Value, minDIdx] = min(R.(Objective)(:));
-    [minD.I_a, minD.I_b] = ind2sub(size(R.(Objective)),minDIdx);
-    minD.a = Range_a(minD.I_a); minD.b = Range_b(minD.I_b);
+    % Searching the cutting plane with minimum objective
+    [minObj.Value, minDIdx] = min(R.(Objective)(:));
+    [minObj.I_a, minObj.I_b] = ind2sub(size(R.(Objective)),minDIdx);
+    minObj.a = Range_a(minObj.I_a); minObj.b = Range_b(minObj.I_b);
     if GD.Verbose
-        disp([newline ' Minimum ' Objective ': ' num2str(minD.Value, '%1.2f') ' mm for ' ...
-            char(945) ' = ' num2str(minD.a) '° & ' ...
-            char(946) ' = ' num2str(minD.b) '°.' newline])
+        disp([newline ' Minimum ' Objective ': ' num2str(minObj.Value, '%1.2f') ' mm for ' ...
+            char(945) ' = ' num2str(minObj.a) '° & ' ...
+            char(946) ' = ' num2str(minObj.b) '°.' newline])
     end
     
-    GD.Results.OldDMin(1) = GD.Results.OldDMin(1)+minD.a;
-    GD.Results.OldDMin(2) = GD.Results.OldDMin(2)+minD.b;
+    GD.Iteration.OldMin(1) = GD.Iteration.OldMin(1)+minObj.a;
+    GD.Iteration.OldMin(2) = GD.Iteration.OldMin(2)+minObj.b;
     
-    % Stop the Rough Iteration if the minimum dispersion lies inside the
+    % Stop the Rough Iteration if the minimum objective lies inside the
     % search space and not on the borders.
-    if minD.a == -PVR || minD.a == PVR || minD.b == -PVR || minD.b == PVR
+    if minObj.a == -PVR || minObj.a == PVR || minObj.b == -PVR || minObj.b == PVR
         GD.Iteration.Rough = 1;
     else
         GD.Iteration.Rough = 0;
     end
     
-    MinNC = CutVariations{minD.I_a,minD.I_b};
+    MinNC = CutVariations{minObj.I_a,minObj.I_b};
     
     switch Objective
         case 'perimeter'
@@ -310,8 +310,8 @@ if sum(sum(~isnan(R.(Objective))))>=4
             GD.Results.PlaneRotMat = MinNC.PRM'; % in this case TFM' == inv(TFM)
             
             % Calculate centers in 3D for minimum dispersion
-            EllpCen3D = nan(NoP,3);
-            for c=1:NoP
+            EllpCen3D = nan(NoCP,3);
+            for c=1:NoCP
                 % Save the ellipse center for the Line fit
                 EllpCen3D(c,:) = CalculatePointInEllipse3D(...
                     MinNC.P(c).Ell.z, MinNC.P(c).xyz(1,3), MinNC.PRM);
@@ -322,7 +322,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
             GD.Results.CenterLineIdx = lineToVertexIndices(GD.Results.CenterLine, Bone);
             
             % Display info about the ellipses in the command window
-            EllResults = FNA_CalcAndPrintEllipseResults(MinNC, NoP, GD.Verbose);
+            EllResults = FNA_CalcAndPrintEllipseResults(MinNC, NoCP, GD.Verbose);
             GD.Results.Ell.a = EllResults(1,:);
             GD.Results.Ell.b = EllResults(2,:);
     end
@@ -340,7 +340,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
             case 'perimeter'
                 % Plot the contours in 2D (Right subplot) for minimum perimeter
                 cla(H2D);
-                title(H2D, ['Min. perimeter of the contours in red: ' num2str(minD.Value,'%.1f') ' mm'])
+                title(H2D, ['Min. perimeter of the contours in red: ' num2str(minObj.Value,'%.1f') ' mm'])
                 hold(H2D,'on')
                 % Plot contours in 2D
                 C2D_Handle = arrayfun(@(x) plot(H2D, x.xyz(:,1),x.xyz(:,2),'k'), MinNC.P,'uni',0);
@@ -366,10 +366,10 @@ if sum(sum(~isnan(R.(Objective))))>=4
             case 'dispersion'
                 % Plot the ellipses in 2D (Right subplot) for minimum dispersion
                 cla(H2D);
-                title(H2D, ['Minimum dispersion of the centers: ' num2str(minD.Value,'%.2f') ' mm'])
+                title(H2D, ['Minimum dispersion of the centers: ' num2str(minObj.Value,'%.2f') ' mm'])
                 hold(H2D,'on')
                 % Plot the ellipses in 2D
-                for c=1:NoP
+                for c=1:NoCP
                     FNA_VisualizeEll2D(H2D, MinNC.P(c), 'm');
                 end
                 hold(H2D,'off')
@@ -378,7 +378,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
                 title(H3D, 'Line fit through the centers for minimum dispersion')
                 hold(H3D,'on')
                 % Plot contours, ellipses & foci in 3D for minimum dispersion
-                for c=1:NoP
+                for c=1:NoCP
                     FNA_VisualizeContEll3D(H3D, MinNC.P(c), MinNC.PRM, 'm');
                 end
                 
@@ -391,8 +391,8 @@ if sum(sum(~isnan(R.(Objective))))>=4
         drawnow
         
         % Enable the Save button
-        if isfield(GD.Results, 'B_H_SaveResults')
-            set(GD.Results.B_H_SaveResults,'Enable','on')
+        if isfield(GD.Figure, 'SaveResultsHandle')
+            GD.Figure.SaveResultsHandle.Enable = 'on';
         end
     end
 end

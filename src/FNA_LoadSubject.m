@@ -15,8 +15,8 @@ if ishandle(hObject)
     
     % Store subject data
     GD.Subject.Mesh = B(ismember({B.name}, ['Femur_' GD.Subject.Side])).mesh;
-    GD.Subject.NeckAxis = NeckAxis;
-    GD.Subject.ShaftAxis = ShaftAxis;
+    GD.Subject.NeckAxis = normalizeLine3d(NeckAxis);
+    GD.Subject.ShaftAxis = normalizeLine3d(ShaftAxis);
 end
 
 %% Check direction of neck and shaft axis
@@ -25,22 +25,21 @@ end
 if sign(GD.Subject.NeckAxis(4:6)) ~= sign(normalizeVector3d(NeckShaftIts(1:3)-GD.Subject.NeckAxis(1:3)))
     GD.Subject.NeckAxis(4:6)=-GD.Subject.NeckAxis(4:6);
 end
-GD.Subject.initalNeckAxis = normalizeLine3d(GD.Subject.NeckAxis);
 
 
 %% Create initial transformation
-TRANS = createTranslation3d(-GD.Subject.initalNeckAxis(1:3));
-ROT = createRotationVector3d(GD.Subject.initalNeckAxis(4:6),[0 0 1]);
+TRANS = createTranslation3d(-GD.Subject.NeckAxis(1:3));
+ROT = createRotationVector3d(GD.Subject.NeckAxis(4:6),[0 0 1]);
 GD.Subject.TFM = ROT*TRANS;
 
 if GD.Visualization
     % Inital view of the 3D plot
-    GD.Subject.ViewVector(1,:)= normalizeVector3d(GD.Subject.ShaftAxis(4:6));
-    GD.Subject.ViewVector(2,:)= normalizeVector3d(...
-        crossProduct3d(GD.Subject.ViewVector(1,:),GD.Subject.initalNeckAxis(4:6)));
+    GD.Subject.ViewVector(1,:) = GD.Subject.ShaftAxis(4:6);
+    GD.Subject.ViewVector(2,:) = normalizeVector3d(...
+        crossProduct3d(GD.Subject.ViewVector(1,:), GD.Subject.NeckAxis(4:6)));
     GD.Subject.ViewVector = transformVector3d(GD.Subject.ViewVector, GD.Subject.TFM);
     if GD.Subject.ViewVector(1,3) > 0
-        GD.Subject.ViewVector(1,:)=-GD.Subject.ViewVector(1,:);
+        GD.Subject.ViewVector(1,:) = -GD.Subject.ViewVector(1,:);
     end
     switch GD.Subject.Side
         case 'R'

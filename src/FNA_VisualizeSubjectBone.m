@@ -15,7 +15,7 @@ boneProps.FaceAlpha = 0.7;
 boneProps.EdgeLighting = 'none';
 boneProps.FaceLighting = 'gouraud';
 boneProps.HandleVisibility = 'Off';
-GD.Subject.PatchHandle = patch(H3D,...
+GD.Figure.MeshHandle = patch(H3D,...
     transformPoint3d(GD.Subject.Mesh, GD.Subject.TFM), boneProps);
 
 %% Plot the Default Neck Plane (DNP)
@@ -23,8 +23,8 @@ planeProps.FaceAlpha = 0.2;
 planeProps.EdgeColor = 'none';
 planeProps.HandleVisibility = 'Off';
 planeProps.FaceColor = 'k';
-DNPlane=createPlane([0,0,0], [0,0,1]);
-GD.DNPlaneHandle = drawPlatform(H3D, DNPlane, 100, planeProps);
+DNP = createPlane([0,0,0], [0,0,1]);
+GD.Figure.DNPHandle = drawPlatform(H3D, DNP, 100, planeProps);
 
 %% Set view to a unified camera position
 set(H3D,'CameraTarget',[0 0 0]);

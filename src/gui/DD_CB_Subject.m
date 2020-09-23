@@ -11,5 +11,5 @@ GD.Subject.Name = Subjects{Index,1};
 GD.Subject.Side = Subjects{Index,4};
 guidata(hObject,GD);
 
-set(GD.Results.B_H_SaveResults,'Enable','off')
+GD.Figure.SaveResultsHandle.Enable = 'off';
 end

@@ -12,7 +12,7 @@ if ishandle(hObject)
 end
 
 % Variable to save the rotation values during the rough iterations
-GD.Results.OldDMin(1) = 0; GD.Results.OldDMin(2) = 0;
+GD.Iteration.OldMin(1) = 0; GD.Iteration.OldMin(2) = 0;
 
 %% Rough Iteration
 if GD.Verbose == 1
@@ -28,8 +28,8 @@ while GD.Iteration.Rough == 1
         % Clear left subplot
         title(GD.Figure.D3Handle,'');
         ClearPlot(GD.Figure.D3Handle, {'Patch','Scatter','Line'})
-        delete(GD.Subject.PatchHandle);
-        delete(GD.DNPlaneHandle);
+        delete(GD.Figure.MeshHandle);
+        delete(GD.Figure.DNPHandle);
         % Plot bone with newest transformation
         GD = FNA_VisualizeSubjectBone(GD);
         drawnow;
@@ -46,19 +46,19 @@ if GD.Verbose == 1
     disp('----- Starting Fine Iteration ------------------------------------');
 end
 % Save the GUI values of Plane Variation Range & Step Size
-OldPVRange  = GD.FNA_Algorithm.PlaneVariationRange;
-OldStepSize = GD.FNA_Algorithm.StepSize;
+OldPVRange  = GD.Algorithm.PlaneVariationRange;
+OldStepSize = GD.Algorithm.StepSize;
 
 % The new Step Size for the Fine Iteration
 FineStepSize = 0.5;
-if GD.FNA_Algorithm.StepSize >= 1
+if GD.Algorithm.StepSize >= 1
     % The new Plane Variation Range is the Step Size of the Rough
-    GD.FNA_Algorithm.PlaneVariationRange = GD.FNA_Algorithm.StepSize;
+    GD.Algorithm.PlaneVariationRange = GD.Algorithm.StepSize;
 else
     % Minimal Plane Variation Range is the fine Step Size.
-    GD.FNA_Algorithm.PlaneVariationRange = FineStepSize;
+    GD.Algorithm.PlaneVariationRange = FineStepSize;
 end
-GD.FNA_Algorithm.StepSize = FineStepSize;
+GD.Algorithm.StepSize = FineStepSize;
 GD = FNA_Algorithm(GD);
 % Calculate the femoral neck axis (FNA) in the FNA system
 % FNA_FNA = transformLine3d(GD.Results.CenterLine, GD.Results.PlaneRotMat);
@@ -82,8 +82,8 @@ if GD.Verbose == 1
 end
 
 % Set Plane Variation Range & Step Size to the old GUI values
-GD.FNA_Algorithm.PlaneVariationRange = OldPVRange;
-GD.FNA_Algorithm.StepSize = OldStepSize;
+GD.Algorithm.PlaneVariationRange = OldPVRange;
+GD.Algorithm.StepSize = OldStepSize;
 
 if ishandle(hObject); guidata(hObject,GD); end
 end

@@ -7,6 +7,6 @@ function FNA_CB_StepSize(hObject, ~)
 
 GD = guidata(hObject);
 Index = get(hObject,'Value');
-GD.FNA_Algorithm.StepSize = Index;
+GD.Algorithm.StepSize = Index;
 guidata(hObject,GD);
 end

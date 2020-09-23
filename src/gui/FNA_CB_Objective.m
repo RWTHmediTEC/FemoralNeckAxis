@@ -6,8 +6,8 @@ function FNA_CB_Objective(hObject, ~)
 %
 
 GD = guidata(hObject);
-GD.FNA_Algorithm.Objective = hObject.String{hObject.Value};
+GD.Algorithm.Objective = hObject.String{hObject.Value};
 guidata(hObject,GD);
 
-set(GD.Results.B_H_SaveResults,'Enable','off')
+GD.Figure.SaveResultsHandle.Enable = 'off';
 end
