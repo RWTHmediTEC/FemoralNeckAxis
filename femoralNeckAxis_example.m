@@ -28,7 +28,7 @@ load('VSD\MATLAB\res\VSD_Subjects.mat', 'Subjects')
 Subjects = table2cell(Subjects);
 Subjects(1:2:20,4) = {'L'}; Subjects(2:2:20,4) = {'R'};
 
-for s=7%:size(Subjects, 1)
+for s=1%:size(Subjects, 1)
     
     % Prepare distal femur
     load(['VSD\Bones\' Subjects{s,1} '.mat'], 'B');
