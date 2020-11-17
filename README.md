@@ -1,5 +1,5 @@
 # FemoralNeckAxis
-MATLAB function for the optimization of the femoral neck axis using surface models of the proximal femur.
+MATLAB function for the optimization of the femoral neck axis using a surface model of the proximal femur.
 
 ## Reference
 Please cite the following paper:<br/>
