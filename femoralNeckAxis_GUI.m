@@ -20,9 +20,9 @@ end
 
 %% Get Subjects
 GD.Subject.DataPath = {'VSD\Bones\','data\'};
-load('VSD\MATLAB\res\VSD_Subjects.mat', 'Subjects')
-Subjects = table2cell(Subjects);
-Subjects(1:2:20,4) = {'L'}; Subjects(2:2:20,4) = {'R'};
+Subjects = dir('data\*.mat');
+Subjects = strrep({Subjects.name}','.mat','');
+Subjects(1:2:20,2) = {'L'}; Subjects(2:2:20,2) = {'R'};
 
 % Number of cutting planes
 GD.Algorithm.NoOfCuttingPlanes = 15;
@@ -96,7 +96,7 @@ FontPropsB.FontSize = 0.5;
 %% Controls on the Top of the GUI - LEFT SIDE
 % Entries of the dropdown menue as string
 GD.Subject.Name = Subjects{1,1};
-GD.Subject.Side = Subjects{1,4};
+GD.Subject.Side = Subjects{1,2};
 % Subject static text
 uicontrol('Style','text','String','Subject: ','HorizontalAlignment','Right',...
     'BackgroundColor','w','Units','normalized','Position',[0.13-BSX 0.97 BSX/2 BSY],FontPropsA)

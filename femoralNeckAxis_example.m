@@ -24,29 +24,30 @@ if ~exist('VSD', 'dir')
 end
 
 %% Load subject names
-load('VSD\MATLAB\res\VSD_Subjects.mat', 'Subjects')
-Subjects = table2cell(Subjects);
-Subjects(1:2:20,4) = {'L'}; Subjects(2:2:20,4) = {'R'};
+Subjects = dir('data\*.mat');
+Subjects = strrep({Subjects.name}','.mat','');
+Subjects(1:2:20,2) = {'L'}; Subjects(2:2:20,2) = {'R'};
 
 for s=1%:size(Subjects, 1)
+    name = Subjects{s,1};
+    side = Subjects{s,2};
     
     % Prepare distal femur
-    load(['VSD\Bones\' Subjects{s,1} '.mat'], 'B');
-    load(['data\' Subjects{s,1} '.mat'],'NeckAxis','ShaftAxis');
-    femur = B(ismember({B.name}, ['Femur_' Subjects{s,4}])).mesh;
+    load(['VSD\Bones\' name '.mat'], 'B');
+    load(['data\' name '.mat'],'NeckAxis','ShaftAxis');
+    femur = B(ismember({B.name}, ['Femur_' side])).mesh;
     
     %% Select different options by commenting
     % Default mode
-    [FNA, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
-        'Subject',Subjects{s,1});
+    [FNA, FNA_TFM] = femoralNeckAxis(femur, side, NeckAxis, ShaftAxis, 'Subject',name);
     % Silent mode
-    % [FNA, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
-    %    'Subject',Subjects{s,1}, 'Visu', false, 'Verbose', false);
+    % [FNA, FNA_TFM] = femoralNeckAxis(femur, side, NeckAxis, ShaftAxis, 'Subject',name,...
+    %    'Visu', false, 'Verbose', false);
     % Other options
-    % [FNA, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
-    %    'Subject',Subjects{s,1}, 'Objective', 'dispersion');
-    % [FNA, FNA_TFM] = femoralNeckAxis(femur, Subjects{s,4}, NeckAxis, ShaftAxis, ...
-    %    'Subject',Subjects{s,1}, 'PlaneVariationRange', 12, 'StepSize', 3);
+    % [FNA, FNA_TFM] = femoralNeckAxis(femur, side, NeckAxis, ShaftAxis, 'Subject',name,...
+    %    'Objective', 'dispersion');
+    % [FNA, FNA_TFM] = femoralNeckAxis(femur, side, NeckAxis, ShaftAxis, 'Subject',name,...
+    %    'PlaneVariationRange', 12, 'StepSize', 3);
     
 end
 
