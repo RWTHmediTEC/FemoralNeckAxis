@@ -2,14 +2,36 @@ function GD = FNA_Algorithm(GD)
 %FNA_ALGORITHM
 %    - An optimization algorithm for establishing a femoral neck axis (FNA)
 %
-%   REFERENCE:
-%       none
+%   INPUT
+%       GD - A struct containing several fields:
+%         SUBJECT DATA
+%           GD.Subject.Mesh: The mesh of the proximal femur
+%           GD.Subject.TFM
+%         ALGORITHM SETTINGS
+%           GD.Algorithm.PlaneVariationRange
+%           GD.Algorithm.StepSize
+%           GD.Algorithm.NoCuttingPlanes
+%           GD.Algorithm.Objective
+%         VISUALIZATION SETTINGS
+%           GD.Visualization
+%           GD.Figure.D2Handle
+%           GD.Figure.D3Handle
+%           GD.Figure.DispersionHandle
+%           GD.Algorithm.PlotPlaneVariation
+%           GD.Algorithm.EllipsePlot
+%           GD.Verbose
 %
-%   INPUT:
-%       TODO
+%   OUTPUT
+%         RESULTS
+%           GD.Results.PlaneRotMat
+%           GD.Results.CenterLine & GD.Results.CenterLineIdx
+%         ITERATION
+%           GD.Iteration.Rough
+%           GD.Iteration.OldMin
 %
-%   OUTPUT:
-%       TODO
+%   REFERENCE
+%       Inspired by: 2010 - Li et al. - Automating Analyses of the Distal 
+%       Femur Articular Geometry Basedon Three-Dimensional Surface Data
 %
 % AUTHOR: Maximilian C. M. Fischer
 % COPYRIGHT (C) 2017 - 2020 Maximilian C. M. Fischer
@@ -17,7 +39,7 @@ function GD = FNA_Algorithm(GD)
 % 
 
 visu = GD.Visualization;
-if visu == 1
+if visu
     % Figure & subplot handles
     H3D = GD.Figure.D3Handle;
     H2D = GD.Figure.D2Handle;
@@ -46,6 +68,9 @@ EllipsePlot = GD.Algorithm.EllipsePlot;
 % Objective of the iteration process
 Objective = GD.Algorithm.Objective;
 
+% Verbositiy
+verbose = GD.Verbose;
+
 %% START OF THE FRAMEWORK -------------------------------------------------
 % An optimization algorithm for establishing a femoral neck axis (FNA)
 
@@ -71,7 +96,7 @@ R.perimeter  = nan(RangeLength_a,RangeLength_b);
 % Cell array to save the results of each plane variation
 CutVariations = cell(RangeLength_a,RangeLength_b);
 
-if GD.Verbose
+if verbose
     % Start updated command window information
     dispstat('','init');
     dispstat('Initializing the iteration process...','keepthis','timestamp');
@@ -140,10 +165,10 @@ for I_a = 1:RangeLength_a
             case 'perimeter'
                 % Calculate the minimum perimeter of the cuts
                 R.perimeter(I_a,I_b) = min([NC.P.length]);
-                if visu == 1
+                if visu
                     %% Visualization during iteration
                     % RIGHT subplot: Plot the ellipses in 2D in the XY-plane
-                    if EllipsePlot == 1
+                    if EllipsePlot
                         % Clear right subplot
                         cla(H2D);
                         hold(H2D,'on')
@@ -159,14 +184,14 @@ for I_a = 1:RangeLength_a
                     % LEFT Subplot: Plot plane variation, contour-parts, ellipses in 3D
                     ClearPlot(H3D, {'Patch','Scatter','Line'})
                     % Plot the plane variation
-                    if PlotPlaneVariation == 1
+                    if PlotPlaneVariation
                         title(H3D, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
                             '\beta = '  num2str(Range_b(I_b)) '°.'])
                         drawPlatform(H3D, createPlane([0, 0, 0], PlaneNormal),100,...
                             'FaceColor','g','FaceAlpha', 0.5);
                     end
                     % Plot contour-parts & ellipses
-                    if EllipsePlot == 1
+                    if EllipsePlot
                         C3D = arrayfun(@(x) transformPoint3d(x.xyz, NC.PRM), NC.P,'uni',0);
                         C3D_Handle = cellfun(@(x) plot3(H3D, x(:,1),x(:,2),x(:,3),'k'), C3D,'uni',0);
                         % Set color of min. perimeter to red
@@ -184,7 +209,7 @@ for I_a = 1:RangeLength_a
                     Contours{c} = NC.P(c).xyz(:,1:2)';
                 end
                 % Parametric least-squares fitting and analysis of cross-sectional profiles
-                tempEll2D = FitEllipseParfor(Contours, GD.Verbose);
+                tempEll2D = FitEllipseParfor(Contours, verbose);
                 for c=1:NoCP
                     NC.P(c).Ell.z = tempEll2D(1:2,c)';
                     NC.P(c).Ell.a = tempEll2D(3,c);
@@ -204,10 +229,10 @@ for I_a = 1:RangeLength_a
                 % Calculate the dispersion as Eccentricity Measure
                 R.dispersion(I_a,I_b) = CalculateDispersion(Center2D);
                 
-                if visu == 1
+                if visu
                     %% Visualization during iteration
                     % RIGHT subplot: Plot the ellipses in 2D in the XY-plane
-                    if EllipsePlot == 1
+                    if EllipsePlot
                         % Clear right subplot
                         cla(H2D);
                         hold(H2D,'on')
@@ -221,14 +246,14 @@ for I_a = 1:RangeLength_a
                     % LEFT Subplot: Plot plane variation, contour-parts, ellipses in 3D
                     ClearPlot(H3D, {'Patch','Scatter','Line'})
                     % Plot the plane variation
-                    if PlotPlaneVariation == 1
+                    if PlotPlaneVariation
                         title(H3D, ['\alpha = ' num2str(Range_a(I_a)) '° & ' ...
                             '\beta = '  num2str(Range_b(I_b)) '°.'])
                         drawPlatform(H3D, createPlane([0, 0, 0], PlaneNormal),100,...
                             'FaceColor','g','FaceAlpha', 0.5);
                     end
                     % Plot contour-parts & ellipses
-                    if EllipsePlot == 1
+                    if EllipsePlot
                         for c=1:NoCP
                             FNA_VisualizeContEll3D(H3D, NC.P(c), NC.PRM, 'm');
                         end
@@ -243,7 +268,7 @@ for I_a = 1:RangeLength_a
         % Count the variation
         PV_Counter=PV_Counter+1;
         
-        if GD.Verbose
+        if verbose
             % Variation info in command window
             dispstat(['Plane variation ' num2str(PV_Counter) ' of ' ...
                 num2str(RangeLength_a*RangeLength_b) '. '...
@@ -253,14 +278,14 @@ for I_a = 1:RangeLength_a
     end
 end
 
-if GD.Verbose
+if verbose
     % Stop updated command window information
     dispstat('','keepprev');
 end
 
 %% Results
 if sum(sum(~isnan(R.(Objective))))>=4
-    if visu == 1
+    if visu
         % convergence plot
         GD.Figure.DispersionHandle.Visible = 'on';
         hold(GD.Figure.DispersionHandle,'on')
@@ -274,7 +299,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
     [minObj.Value, minDIdx] = min(R.(Objective)(:));
     [minObj.I_a, minObj.I_b] = ind2sub(size(R.(Objective)),minDIdx);
     minObj.a = Range_a(minObj.I_a); minObj.b = Range_b(minObj.I_b);
-    if GD.Verbose
+    if verbose
         disp([newline ' Minimum ' Objective ': ' num2str(minObj.Value, '%1.2f') ' mm for ' ...
             char(945) ' = ' num2str(minObj.a) '° & ' ...
             char(946) ' = ' num2str(minObj.b) '°.' newline])
@@ -300,7 +325,7 @@ if sum(sum(~isnan(R.(Objective))))>=4
             [~, minPlaneIdx] = min([MinNC.P.length]);
             PeriCen2D = polygonCentroid(unique(MinNC.P(minPlaneIdx).xyz(:,1:2),'rows','stable'));
             PeriCen3D = transformPoint3d([PeriCen2D, MinNC.P(minPlaneIdx).xyz(1,3)], MinNC.PRM);
-            GD.Results.PlaneRotMat=createTranslation3d(-PeriCen3D)*GD.Results.PlaneRotMat;
+            GD.Results.PlaneRotMat = createTranslation3d(-PeriCen3D)*GD.Results.PlaneRotMat;
             
             PlaneNormal = transformVector3d([0 0 1],MinNC.PRM);
             GD.Results.CenterLine = [PeriCen3D, PlaneNormal];
@@ -320,15 +345,10 @@ if sum(sum(~isnan(R.(Objective))))>=4
             % Calculate axis through the posterior foci
             GD.Results.CenterLine = fitLine3d(EllpCen3D);
             GD.Results.CenterLineIdx = lineToVertexIndices(GD.Results.CenterLine, Bone);
-            
-            % Display info about the ellipses in the command window
-            EllResults = FNA_CalcAndPrintEllipseResults(MinNC, NoCP, GD.Verbose);
-            GD.Results.Ell.a = EllResults(1,:);
-            GD.Results.Ell.b = EllResults(2,:);
     end
     
     %% Visualization of Results
-    if visu == 1
+    if visu
         % Results in the main figure
         % Plot the cutting plane with minimum dispersion (Left subplot)
         ClearPlot(H3D, {'Patch','Scatter','Line'})

@@ -45,12 +45,11 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 %     Run the file 'femoralNeckAxis_example.m' or 'femoralNeckAxis_GUI.m'.
 %
 % TODO/IDEAS:
-%   - Complete header sections
 %
 % AUTHOR: Maximilian C. M. Fischer
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
 % VERSION: 2.0.0
-% DATE: 2020-09-15
+% DATE: 2020-11-17
 % COPYRIGHT (C) 2017 - 2020 Maximilian C. M. Fischer
 % LICENSE: EUPL v1.2
 %
