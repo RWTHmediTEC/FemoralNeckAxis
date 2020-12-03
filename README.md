@@ -3,10 +3,10 @@ MATLAB function for the optimization of the femoral neck axis using a surface mo
 
 ## Reference
 Please cite the following paper:<br/>
-- Fischer et al. - A robust method for automatic identification of femoral landmarks, axes, planes and bone coordinate systems using surface models. Scientific Reports, https://doi.org/10.1038/s41598-020-77479-z (2020)
+- [Fischer 2020] Fischer et al. - A robust method for automatic identification of femoral landmarks, axes, planes and bone coordinate systems using surface models. Scientific Reports, https://doi.org/10.1038/s41598-020-77479-z (2020)
 
 ## Releases
-none
+- v2.0.0 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4280945.svg)](https://doi.org/10.5281/zenodo.4280945) was used in [Fischer 2020]. 
 
 ## Usage 
 Clone and run femoralNeckAxis_example.m in MATLAB. Then try out femoralNeckAxis_GUI.m.<br/>
