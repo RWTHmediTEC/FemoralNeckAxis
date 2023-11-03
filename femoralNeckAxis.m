@@ -67,9 +67,16 @@ GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
 addpath(genpath([GD.ToolPath 'src']));
 
 % Compile mex file if not exist
-mexPath = [GD.ToolPath 'src\external\intersectPlaneSurf'];
-if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
-    mex([mexPath '\IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
+% mexPath = [GD.ToolPath 'src\external\intersectPlaneSurf'];
+% if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
+%     mex([mexPath '\IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
+% end
+mexPath = [GD.ToolPath(1:end-1),filesep,'src',filesep,'external',filesep,'intersectPlaneSurf'];
+
+if ~exist([mexPath,filesep,'IntersectPlaneTriangle.mexw64'],'file')&&~isunix
+    mex([mexPath,filesep,'IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
+elseif ~exist([mexPath,filesep,'IntersectPlaneTriangle.mexa64'],'file')&&isunix
+    mex([mexPath,filesep,'IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
 end
 
 if GD.Visualization == 1
