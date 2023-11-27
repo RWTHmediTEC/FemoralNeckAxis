@@ -61,15 +61,17 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
     validateAndParseInputs(femur, side, neckAxis, shaftAxis, varargin{:});
 
 % FNA path
-GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
+GD.ToolPath = fileparts([mfilename('fullpath'), '.m']);
 
 % Add path for external functions
-addpath(genpath([GD.ToolPath 'src']));
+addpath(genpath(fullfile(GD.ToolPath, 'src')));
 
 % Compile mex file if not exist
-mexPath = [GD.ToolPath 'src\external\intersectPlaneSurf'];
-if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
-    mex([mexPath '\IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
+mexPath = fullfile(GD.ToolPath, 'src', 'external', 'intersectPlaneSurf');
+if ~exist(fullfile(mexPath, 'IntersectPlaneTriangle.mexw64'),'file') && ~isunix
+    mex(fullfile(mexPath, 'IntersectPlaneTriangle.cpp'),'-v','-outdir', mexPath);
+elseif ~exist(fullfile(mexPath, 'IntersectPlaneTriangle.mexa64'),'file') && isunix
+    mex(fullfile(mexPath, 'IntersectPlaneTriangle.cpp'),'-v','-outdir', mexPath);
 end
 
 if GD.Visualization == 1
@@ -82,8 +84,7 @@ if GD.Visualization == 1
         'Color',GD.Figure.Color,...
         'ToolBar','figure',...
         'WindowScrollWheelFcn',@M_CB_Zoom,...
-        'WindowButtonDownFcn',@M_CB_RotateWithMouse,...
-        'renderer','opengl');
+        'WindowButtonDownFcn',@M_CB_RotateWithMouse);
     if     size(MonitorsPos,1) == 1
         set(FH,'OuterPosition',MonitorsPos(1,:));
     elseif size(MonitorsPos,1) == 2

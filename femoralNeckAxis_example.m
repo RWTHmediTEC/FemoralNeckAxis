@@ -4,7 +4,7 @@
 % LICENSE: EUPL v1.2
 %
 
-clearvars; close all; opengl hardware
+clearvars; close all
 
 % Add src path
 addpath(genpath([fileparts([mfilename('fullpath'), '.m']) '\src']));
@@ -23,14 +23,15 @@ if ~exist('VSD', 'dir')
     end
 end
 
-%% Load subject names
-Subjects = dir('data\*.mat');
-Subjects = strrep({Subjects.name}','.mat','');
-Subjects(1:2:20,2) = {'L'}; Subjects(2:2:20,2) = {'R'};
+% Select subjects of the VSD
+subjectXLSX = 'VSD\MATLAB\res\VSD_Subjects.xlsx';
+Subjects = readtable(subjectXLSX);
+Subjects{2:2:height(Subjects),7} = 'R';
+Subjects{1:2:height(Subjects),7} = 'L'; 
 
-for s=1%:size(Subjects, 1)
-    name = Subjects{s,1};
-    side = Subjects{s,2};
+for s=1:size(Subjects, 1)
+    name = Subjects{s,1}{1};
+    side = Subjects{s,7};
     
     % Prepare distal femur
     load(['VSD\Bones\' name '.mat'], 'B');

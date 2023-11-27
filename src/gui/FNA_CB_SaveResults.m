@@ -11,10 +11,10 @@ if isfield(GD.Results, 'PlaneRotMat')
     FNA = GD.Results.FNA;
     FNA_TFM = GD.Subject.TFM;
     
-    if ~isfolder([GD.ToolPath 'results\'])
-        mkdir([GD.ToolPath 'results\'])
+    if ~isfolder(fullfile(GD.ToolPath, 'results'))
+        mkdir(fullfile(GD.ToolPath, 'results'))
     end
-    save([GD.ToolPath 'results\' GD.Subject.Name '.mat'], 'FNA', 'FNA_TFM')
+    save(fullfile(GD.ToolPath, 'results', [GD.Subject.Name '.mat']), 'FNA', 'FNA_TFM')
     
     disp('Results saved.')
 else

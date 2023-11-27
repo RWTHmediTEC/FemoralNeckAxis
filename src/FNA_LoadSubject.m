@@ -10,7 +10,7 @@ if ishandle(hObject)
     
     % Subject data path
     for p=1:length(GD.Subject.DataPath)
-        load([GD.ToolPath GD.Subject.DataPath{p}, GD.Subject.Name '.mat']) %#ok<LOAD>
+        load(fullfile(GD.ToolPath, GD.Subject.DataPath{p}, [GD.Subject.Name '.mat'])) %#ok<LOAD> 
     end
     
     % Store subject data

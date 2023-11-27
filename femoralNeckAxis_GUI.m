@@ -4,25 +4,27 @@
 % LICENSE: EUPL v1.2
 %
 
-clearvars; close all; clc; opengl hardware;
+clearvars; close all
 
 % USP path
-GD.ToolPath = [fileparts([mfilename('fullpath'), '.m']) '\'];
+GD.ToolPath = fileparts([mfilename('fullpath'), '.m']);
 
 % Add path
-addpath(genpath([GD.ToolPath 'src']));
+addpath(genpath(fullfile(GD.ToolPath, 'src')));
 
-% Compile mex file if not exist
-mexPath = [GD.ToolPath 'src\external\intersectPlaneSurf'];
-if ~exist([mexPath '\IntersectPlaneTriangle.mexw64'],'file')
-    mex([mexPath '\IntersectPlaneTriangle.cpp'],'-v','-outdir', mexPath);
+% Compile mex file if it does not exist
+mexPath = fullfile(GD.ToolPath, 'src', 'external', 'intersectPlaneSurf');
+if ~exist(fullfile(mexPath, 'IntersectPlaneTriangle.mexw64'),'file') && ~isunix
+    mex(fullfile(mexPath, 'IntersectPlaneTriangle.cpp'),'-v','-outdir', mexPath);
+elseif ~exist(fullfile(mexPath, 'IntersectPlaneTriangle.mexa64'),'file') && isunix
+    mex(fullfile(mexPath, 'IntersectPlaneTriangle.cpp'),'-v','-outdir', mexPath);
 end
 
-%% Get Subjects
 GD.Subject.DataPath = {'VSD\Bones\','data\'};
-Subjects = dir('data\*.mat');
-Subjects = strrep({Subjects.name}','.mat','');
-Subjects(1:2:20,2) = {'L'}; Subjects(2:2:20,2) = {'R'};
+subjectXLSX = 'VSD\MATLAB\res\VSD_Subjects.xlsx';
+Subjects = readtable(subjectXLSX);
+Subjects{2:2:height(Subjects),7} = 'R';
+Subjects{1:2:height(Subjects),7} = 'L'; 
 
 % Number of cutting planes
 GD.Algorithm.NoOfCuttingPlanes = 15;
@@ -41,8 +43,7 @@ FH = figure(...
     'Color',GD.Figure.Color,...
     'ToolBar','figure',...
     'WindowScrollWheelFcn',@M_CB_Zoom,...
-    'WindowButtonDownFcn',@M_CB_RotateWithMouse,...
-    'renderer','opengl');
+    'WindowButtonDownFcn',@M_CB_RotateWithMouse);
 if     size(MonitorsPos,1) == 1
     set(FH,'OuterPosition',MonitorsPos(1,:));
 elseif size(MonitorsPos,1) == 2
@@ -95,13 +96,13 @@ FontPropsB.FontSize = 0.5;
 
 %% Controls on the Top of the GUI - LEFT SIDE
 % Entries of the dropdown menue as string
-GD.Subject.Name = Subjects{1,1};
-GD.Subject.Side = Subjects{1,2};
+GD.Subject.Name = Subjects{1,1}{1};
+GD.Subject.Side = Subjects{1,7};
 % Subject static text
 uicontrol('Style','text','String','Subject: ','HorizontalAlignment','Right',...
     'BackgroundColor','w','Units','normalized','Position',[0.13-BSX 0.97 BSX/2 BSY],FontPropsA)
 % Subject dropdown menue
-uicontrol('Style', 'popup', 'String',Subjects(:,1)',...
+uicontrol('Style', 'popup', 'String',Subjects.ID,...
     'Units','normalized','Position',      [0.13-BSX*1/2 0.97 BSX BSY],FontPropsB,...
     'Callback', {@DD_CB_Subject, Subjects});
 % Load button
