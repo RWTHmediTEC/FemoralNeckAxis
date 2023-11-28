@@ -50,7 +50,7 @@ function [FNA, FNA_TFM] = femoralNeckAxis(femur, side, neckAxis, shaftAxis, vara
 % 	mediTEC - Chair of Medical Engineering, RWTH Aachen University
 % VERSION: 2.0.0
 % DATE: 2020-11-17
-% COPYRIGHT (C) 2017 - 2020 Maximilian C. M. Fischer
+% COPYRIGHT (C) 2017-2023 Maximilian C. M. Fischer
 % LICENSE: EUPL v1.2
 %
 

@@ -1,7 +1,7 @@
 function Contours = IntersectMeshPlaneParfor(Mesh, PlaneOrigins, PlaneNormals)
 %
 % AUTHOR: Maximilian C. M. Fischer
-% COPYRIGHT (C) 2020 Maximilian C. M. Fischer
+% COPYRIGHT (C) 2020-2023 Maximilian C. M. Fischer
 % LICENSE: EUPL v1.2
 %
 

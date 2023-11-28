@@ -34,7 +34,7 @@ function GD = FNA_Algorithm(GD)
 %       Femur Articular Geometry Basedon Three-Dimensional Surface Data
 %
 % AUTHOR: Maximilian C. M. Fischer
-% COPYRIGHT (C) 2017 - 2020 Maximilian C. M. Fischer
+% COPYRIGHT (C) 2017-2023 Maximilian C. M. Fischer
 % LICENSE: EUPL v1.2
 % 
 
