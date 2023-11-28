@@ -7,12 +7,12 @@
 clearvars; close all
 
 % Add src path
-addpath(genpath([fileparts([mfilename('fullpath'), '.m']) '\src']));
+addpath(genpath(fullfile(fileparts([mfilename('fullpath'), '.m']), 'src')));
 
 %% Clone example data
 if ~exist('VSD', 'dir')
     try
-        !git clone https://github.com/MCM-Fischer/VSDFullBodyBoneModels VSD
+        !git clone --depth 1 https://github.com/MCM-Fischer/VSDFullBodyBoneModels VSD
         rmdir(fullfile('VSD','.git'), 's')
     catch
         warning([newline 'Clone (or copy) the example data from: ' ...
@@ -35,7 +35,7 @@ for s=1:size(Subjects, 1)
     
     % Prepare distal femur
     load(fullfile('VSD', 'Bones', [name '.mat']), 'B');
-    load(fullfile('data', [name '.mat']),'NeckAxis','ShaftAxis');
+    load(fullfile('data', [name '.mat']), 'NeckAxis', 'ShaftAxis');
     femur = B(ismember({B.name}, ['Femur_' side])).mesh;
     
     %% Select different options by commenting

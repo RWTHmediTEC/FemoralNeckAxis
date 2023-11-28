@@ -20,8 +20,9 @@ elseif ~exist(fullfile(mexPath, 'IntersectPlaneTriangle.mexa64'),'file') && isun
     mex(fullfile(mexPath, 'IntersectPlaneTriangle.cpp'),'-v','-outdir', mexPath);
 end
 
-GD.Subject.DataPath = {'VSD\Bones\','data\'};
-subjectXLSX = 'VSD\MATLAB\res\VSD_Subjects.xlsx';
+%% Get Subjects
+GD.Subject.DataPath = {fullfile('VSD', 'Bones'),'data'};
+subjectXLSX = fullfile('VSD', 'MATLAB', 'res', 'VSD_Subjects.xlsx');
 Subjects = readtable(subjectXLSX);
 Subjects{2:2:height(Subjects),7} = 'R';
 Subjects{1:2:height(Subjects),7} = 'L'; 
